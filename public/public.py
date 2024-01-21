@@ -58,14 +58,12 @@ class Public:
             raise Exception("Username or password not provided")
         headers = self.session.headers
         payload = endpoints.build_payload(username, password)
-        # cookies = self._load_cookies()
         self.session.cookies = self._load_cookies()
         response = self.session.post(
             endpoints.login_url(),
             headers=headers,
             data=payload,
             timeout=self.timeout,
-            # cookies=cookies,
         )
         if response.status_code != 200:
             raise Exception("Login failed, check credentials")
@@ -81,7 +79,6 @@ class Public:
                 headers=headers,
                 data=payload,
                 timeout=self.timeout,
-                # cookies=cookies,
             )
             if response.status_code != 200:
                 raise Exception("MFA Login failed, check credentials and code")
@@ -90,7 +87,6 @@ class Public:
                 headers=headers,
                 data=payload,
                 timeout=self.timeout,
-                # cookies=cookies,
             )
             if response.status_code != 200:
                 raise Exception("Here Login failed, check credentials")
