@@ -69,9 +69,8 @@ class Public:
         response = response.json()
         if response["twoFactorResponse"] is not None:
             # self._clear_cookies()
-            print(
-                f'2FA required, code sent to phone number ending in {response["twoFactorResponse"]["phoneNumberLastFour"]}...'
-            )
+            last_four = response["twoFactorResponse"]["phoneNumberLastFour"]
+            print(f'2FA required, code sent to phone number ending in {last_four}...')
             code = input("Enter code: ")
             payload = endpoints.build_payload(username, password, code)
             response = self.session.post(
