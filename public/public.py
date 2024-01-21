@@ -27,15 +27,18 @@ class Public:
         self.all_login_info = None
         self.timeout = 10
 
-    def _save_cookies(self, path=None):
-        filename = "public_credentials.json"
+    def _save_cookies(self, filename=None, path=None):
+        if filename is None:
+            filename = "public_credentials.json"
         if path is not None:
             filename = os.path.join(path, filename)
         with open(filename, "wb") as f:
             pickle.dump(self.session.cookies, f)
 
-    def _load_cookies(self, path=None):
-        filename = "public_credentials.json"
+    @staticmethod
+    def _load_cookies(filename=None, path=None):
+        if filename is None:
+            filename = "public_credentials.json"
         if path is not None:
             filename = os.path.join(path, filename)
         if not os.path.exists(filename):
@@ -43,8 +46,9 @@ class Public:
         with open(filename, "rb") as f:
             return pickle.load(f)
 
-    def _clear_cookies(self, path=None):
-        filename = "public_credentials.json"
+    def _clear_cookies(self, filename=None, path=None):
+        if filename is None:
+            filename = "public_credentials.json"
         if path is not None:
             filename = os.path.join(path, filename)
         if os.path.exists(filename):
