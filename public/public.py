@@ -1,5 +1,5 @@
 import os
-import pickle
+import json
 
 import requests
 
@@ -19,8 +19,6 @@ class Public:
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update(endpoints.build_headers())
-        if self.session.cookies is not None:
-            self.session.cookies.update(self._load_cookies())
         self.access_token = None
         self.account_uuid = None
         self.account_number = None
@@ -32,8 +30,8 @@ class Public:
             filename = "public_credentials.json"
         if path is not None:
             filename = os.path.join(path, filename)
-        with open(filename, "wb") as f:
-            pickle.dump(self.session.cookies, f)
+        with open(filename, "w") as f:
+            json.dump(self.session.cookies.get_dict(), f)
 
     @staticmethod
     def _load_cookies(filename=None, path=None):
@@ -43,8 +41,8 @@ class Public:
             filename = os.path.join(path, filename)
         if not os.path.exists(filename):
             return None
-        with open(filename, "rb") as f:
-            return pickle.load(f)
+        with open(filename, "r") as f:
+            return json.load(f)
 
     def _clear_cookies(self, filename=None, path=None):
         if filename is None:
@@ -72,7 +70,7 @@ class Public:
             raise Exception("Login failed, check credentials")
         response = response.json()
         if response["twoFactorResponse"] is not None:
-            # self._clear_cookies()
+            self._clear_cookies()
             last_four = response["twoFactorResponse"]["phoneNumberLastFour"]
             print(f"2FA required, code sent to phone number ending in {last_four}...")
             code = input("Enter code: ")
@@ -118,7 +116,6 @@ class Public:
 
     @login_required
     def get_portfolio(self):
-        # self._refresh_token()
         headers = endpoints.build_headers(self.access_token)
         portfolio = self.session.get(
             endpoints.portfolio_url(self.account_uuid),
@@ -131,8 +128,6 @@ class Public:
 
     @login_required
     def get_account_number(self):
-        # account_info = self.get_portfolio()
-        # return account_info["accountNumber"]
         return self.account_number
 
     @login_required
