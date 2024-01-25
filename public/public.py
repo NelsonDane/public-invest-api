@@ -1,10 +1,10 @@
 import os
+import pickle
+from time import sleep
 
 import requests
-import pickle
 
 from . import endpoints
-from time import sleep
 
 
 def login_required(func):
@@ -242,7 +242,7 @@ class Public:
             # Empty dict is success
             if submit_response != {}:
                 print(f"Submit response: {submit_response}")
-                raise Exception(f"Order failed: {submit_response}")          
+                raise Exception(f"Order failed: {submit_response}")
             sleep(1)
         # Check if order was rejected
         check_response = self.session.get(
