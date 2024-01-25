@@ -22,14 +22,33 @@ def get_quote_url(symbol):
     return f"https://prod-api.154310543964.hellopublic.com/marketdataservice/stockcharts/last-trade/{symbol}"
 
 
-def build_headers(auth=None):
+def get_order_quote(symbol):
+    return f"https://prod-api.154310543964.hellopublic.com/tradingservice/quote/equity/{symbol}"
+
+
+def build_order_url(account_uuid):
+    return f"https://prod-api.154310543964.hellopublic.com/customerordergateway/accounts/{account_uuid}/orders"
+
+
+def preflight_order_url(account_uuid):
+    return f"https://prod-api.154310543964.hellopublic.com/customerordergateway/accounts/{account_uuid}/orders/preflight"
+
+
+def submit_put_order_url(account_uuid, order_id):
+    return f"https://prod-api.154310543964.hellopublic.com/customerordergateway/accounts/{account_uuid}/orders/{order_id}"
+
+
+def submit_get_order_url(account_uuid, order_id):
+    return f"https://prod-api.154310543964.hellopublic.com/hstier1service/account/{account_uuid}/order/{order_id}"
+
+
+def build_headers(auth=None, prodApi=False):
     headers = {
         "authority": "public.com",
         "accept": "*/*",
         "accept-language": "en-US,en;q=0.5",
         "content-type": "application/json",
         "origin": "https://public.com",
-        "referer": "https://public.com/login",
         "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Brave";v="120"',
         "sec-ch-ua-mobile": "?0",
         "sec-ch-ua-platform": '"macOS"',
@@ -38,10 +57,13 @@ def build_headers(auth=None):
         "sec-fetch-site": "same-origin",
         "sec-gpc": "1",
         "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "x-app-version": "web-1.0.4",
+        "x-app-version": "web-1.0.5",
     }
     if auth is not None:
         headers["authorization"] = auth
+    if prodApi:
+        headers["authority"] = "prod-api.154310543964.hellopublic.com"
+        headers["sec-fetch-site"] = "cross-site"
     return headers
 
 

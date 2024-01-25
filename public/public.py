@@ -1,9 +1,10 @@
-import json
 import os
 
 import requests
+import pickle
 
 from . import endpoints
+from time import sleep
 
 
 def login_required(func):
@@ -16,7 +17,7 @@ def login_required(func):
 
 
 class Public:
-    def __init__(self):
+    def __init__(self, filename=None, path=None):
         self.session = requests.Session()
         self.session.headers.update(endpoints.build_headers())
         self.access_token = None
@@ -24,31 +25,35 @@ class Public:
         self.account_number = None
         self.all_login_info = None
         self.timeout = 10
-
-    def _save_cookies(self, filename=None, path=None):
-        if filename is None:
-            filename = "public_credentials.json"
+        self.filename = "public_credentials.pkl"
+        if filename is not None:
+            self.filename = filename
+        self.path = None
         if path is not None:
-            filename = os.path.join(path, filename)
-        with open(filename, "w") as f:
-            json.dump(self.session.cookies.get_dict(), f)
+            self.path = path
+        self._load_cookies()
 
-    @staticmethod
-    def _load_cookies(filename=None, path=None):
-        if filename is None:
-            filename = "public_credentials.json"
-        if path is not None:
-            filename = os.path.join(path, filename)
+    def _save_cookies(self):
+        filename = self.filename
+        if self.path is not None:
+            filename = os.path.join(self.path, filename)
+        with open(filename, "wb") as f:
+            pickle.dump(self.session.cookies, f)
+
+    def _load_cookies(self):
+        filename = self.filename
+        if self.path is not None:
+            filename = os.path.join(self.path, filename)
         if not os.path.exists(filename):
-            return None
-        with open(filename, "r") as f:
-            return json.load(f)
+            return False
+        with open(filename, "rb") as f:
+            self.session.cookies.update(pickle.load(f))
+        return True
 
-    def _clear_cookies(self, filename=None, path=None):
-        if filename is None:
-            filename = "public_credentials.json"
-        if path is not None:
-            filename = os.path.join(path, filename)
+    def _clear_cookies(self):
+        filename = self.filename
+        if self.path is not None:
+            filename = os.path.join(self.path, filename)
         if os.path.exists(filename):
             os.remove(filename)
         self.session.cookies.clear()
@@ -58,7 +63,7 @@ class Public:
             raise Exception("Username or password not provided")
         headers = self.session.headers
         payload = endpoints.build_payload(username, password)
-        self.session.cookies = self._load_cookies()
+        self._load_cookies()
         response = self.session.post(
             endpoints.login_url(),
             headers=headers,
@@ -154,13 +159,97 @@ class Public:
         return response.json()["price"]
 
     @login_required
+    def get_order_quote(self, symbol):
+        headers = endpoints.build_headers(self.access_token)
+        response = self.session.get(
+            endpoints.get_order_quote(symbol), headers=headers, timeout=self.timeout
+        )
+        if response.status_code == 400:
+            return None
+        if response.status_code != 200:
+            raise Exception("Symbol price request failed")
+        return response.json()
+
+    @login_required
     def place_order(
+        self,
         symbol,
         quantity,
         side,
         order_type,
         time_in_force,
+        is_dry_run=False,
         limit_price=None,
         stop_price=None,
+        tip=None,
     ):
-        raise NotImplementedError("Place order not implemented yet")
+        # raise NotImplementedError("Place order not implemented yet")
+        headers = endpoints.build_headers(self.access_token, prodApi=True)
+        symbol = symbol.upper()
+        time_in_force = time_in_force.upper()
+        order_type = order_type.upper()
+        side = side.upper()
+        if time_in_force not in ["DAY", "GTC", "IOC", "FOK"]:
+            raise Exception(f"Invalid time in force: {time_in_force}")
+        if order_type not in ["MARKET", "LIMIT", "STOP"]:
+            raise Exception(f"Invalid order type: {order_type}")
+        if side not in ["BUY", "SELL"]:
+            raise Exception(f"Invalid side: {side}")
+        if tip == 0:
+            tip = None
+        # Need to get quote first
+        quote = self.get_order_quote(symbol)
+        print(f"Quote: {quote}")
+        payload = {
+            "symbol": symbol,
+            "orderSide": side,
+            "type": order_type,
+            "timeInForce": time_in_force,
+            "quote": quote,
+            "quantity": quantity,
+            "tipAmount": tip,
+        }
+        # Preflight order endpoint
+        preflight = self.session.post(
+            endpoints.preflight_order_url(self.account_uuid),
+            headers=headers,
+            json=payload,
+            timeout=self.timeout,
+        )
+        preflight = preflight.json()
+        print(f"Preflight response: {preflight}")
+        # Build order endpoint
+        build_response = self.session.post(
+            endpoints.build_order_url(self.account_uuid),
+            headers=headers,
+            json=payload,
+            timeout=self.timeout,
+        )
+        build_response = build_response.json()
+        print(f"Build order response: {build_response}")
+        if build_response.get("orderId") is None:
+            raise Exception(f"No order ID: {build_response}")
+        order_id = build_response["orderId"]
+        # Submit order with put
+        print(f"Order ID: {order_id}")
+        if not is_dry_run:
+            submit_response = self.session.put(
+                endpoints.submit_put_order_url(self.account_uuid, order_id),
+                headers=headers,
+                timeout=self.timeout,
+            )
+            submit_response = submit_response.json()
+            # Empty dict is success
+            if submit_response != {}:
+                print(f"Submit response: {submit_response}")
+                raise Exception(f"Order failed: {submit_response}")          
+            sleep(1)
+        # Check if order was rejected
+        check_response = self.session.get(
+            endpoints.submit_get_order_url(self.account_uuid, order_id),
+            headers=headers,
+            timeout=self.timeout,
+        )
+        check_response = check_response.json()
+        print(f"Submit response: {check_response}")
+        return check_response
