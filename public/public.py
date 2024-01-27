@@ -71,6 +71,7 @@ class Public:
             timeout=self.timeout,
         )
         if response.status_code != 200:
+            print(response.text)
             raise Exception("Login failed, check credentials")
         response = response.json()
         if response["twoFactorResponse"] is not None:
