@@ -58,7 +58,7 @@ class Public:
             os.remove(filename)
         self.session.cookies.clear()
 
-    def login(self, username=None, password=None):
+    def login(self, username=None, password=None, wait_for_2fa=True, code=None):
         if username is None or password is None:
             raise Exception("Username or password not provided")
         headers = self.session.headers
@@ -77,7 +77,10 @@ class Public:
             self._clear_cookies()
             last_four = response["twoFactorResponse"]["phoneNumberLastFour"]
             print(f"2FA required, code sent to phone number ending in {last_four}...")
-            code = input("Enter code: ")
+            if not wait_for_2fa and code is None:
+                raise Exception("2FA required: please provide code")
+            if code is None:
+                code = input("Enter code: ")
             payload = endpoints.build_payload(username, password, code)
             response = self.session.post(
                 endpoints.mfa_url(),
@@ -94,7 +97,7 @@ class Public:
                 timeout=self.timeout,
             )
             if response.status_code != 200:
-                raise Exception("Here Login failed, check credentials")
+                raise Exception("Login failed, check credentials")
             response = response.json()
         self.access_token = response["loginResponse"]["accessToken"]
         self.account_uuid = response["loginResponse"]["accounts"][0]["accountUuid"]
