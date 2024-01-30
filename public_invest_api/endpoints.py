@@ -6,15 +6,17 @@ class Endpoints:
     def __init__(self):
         self.baseurl = "https://public.com"
         self.prodapi = "https://prod-api.154310543964.hellopublic.com"
+        self.ordergateway = f"{self.prodapi}/customerordergateway"
+        self.userservice = f"{self.baseurl}/userservice"
 
     def login_url(self):
-        return f"{self.baseurl}/userservice/public/web/login"
+        return f"{self.userservice}/public/web/login"
 
     def mfa_url(self):
-        return f"{self.baseurl}/userservice/public/web/verify-two-factor"
+        return f"{self.userservice}/public/web/verify-two-factor"
 
     def refresh_url(self):
-        return f"{self.baseurl}/userservice/public/web/token-refresh"
+        return f"{self.userservice}/public/web/token-refresh"
 
     def portfolio_url(self, account_uuid):
         return f"{self.prodapi}/hstier1service/account/{account_uuid}/portfolio"
@@ -26,13 +28,13 @@ class Endpoints:
         return f"{self.prodapi}/tradingservice/quote/equity/{symbol}"
 
     def build_order_url(self, account_uuid):
-        return f"{self.prodapi}/customerordergateway/accounts/{account_uuid}/orders"
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders"
 
     def preflight_order_url(self, account_uuid):
-        return f"{self.prodapi}/customerordergateway/accounts/{account_uuid}/orders/preflight"
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/preflight"
 
     def submit_put_order_url(self, account_uuid, order_id):
-        return f"{self.prodapi}/customerordergateway/accounts/{account_uuid}/orders/{order_id}"
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
     def submit_get_order_url(self, account_uuid, order_id):
         return f"{self.prodapi}/hstier1service/account/{account_uuid}/order/{order_id}"

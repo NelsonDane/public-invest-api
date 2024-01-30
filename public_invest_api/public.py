@@ -186,11 +186,8 @@ class Public:
         order_type,
         time_in_force,
         is_dry_run=False,
-        limit_price=None,
-        stop_price=None,
         tip=None,
     ):
-        # raise NotImplementedError("Place order not implemented yet")
         headers = self.endpoints.build_headers(self.access_token, prodApi=True)
         symbol = symbol.upper()
         time_in_force = time_in_force.upper()
