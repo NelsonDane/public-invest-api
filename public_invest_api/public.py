@@ -167,7 +167,9 @@ class Public:
     def get_order_quote(self, symbol):
         headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
-            self.endpoints.get_order_quote(symbol), headers=headers, timeout=self.timeout
+            self.endpoints.get_order_quote(symbol),
+            headers=headers,
+            timeout=self.timeout,
         )
         if response.status_code == 400:
             return None
