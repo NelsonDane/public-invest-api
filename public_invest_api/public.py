@@ -4,7 +4,7 @@ from time import sleep
 
 import requests
 
-from . import endpoints
+from public_invest_api.endpoints import Endpoints
 
 
 def login_required(func):
@@ -19,7 +19,8 @@ def login_required(func):
 class Public:
     def __init__(self, filename=None, path=None):
         self.session = requests.Session()
-        self.session.headers.update(endpoints.build_headers())
+        self.endpoints = Endpoints()
+        self.session.headers.update(self.endpoints.build_headers())
         self.access_token = None
         self.account_uuid = None
         self.account_number = None
@@ -62,10 +63,10 @@ class Public:
         if username is None or password is None:
             raise Exception("Username or password not provided")
         headers = self.session.headers
-        payload = endpoints.build_payload(username, password)
+        payload = self.endpoints.build_payload(username, password)
         self._load_cookies()
         response = self.session.post(
-            endpoints.login_url(),
+            self.endpoints.login_url(),
             headers=headers,
             data=payload,
             timeout=self.timeout,
@@ -82,9 +83,9 @@ class Public:
                 raise Exception("2FA required: please provide code")
             if code is None:
                 code = input("Enter code: ")
-            payload = endpoints.build_payload(username, password, code)
+            payload = self.endpoints.build_payload(username, password, code)
             response = self.session.post(
-                endpoints.mfa_url(),
+                self.endpoints.mfa_url(),
                 headers=headers,
                 data=payload,
                 timeout=self.timeout,
@@ -92,7 +93,7 @@ class Public:
             if response.status_code != 200:
                 raise Exception("MFA Login failed, check credentials and code")
             response = self.session.post(
-                endpoints.login_url(),
+                self.endpoints.login_url(),
                 headers=headers,
                 data=payload,
                 timeout=self.timeout,
@@ -111,7 +112,7 @@ class Public:
     def _refresh_token(self):
         headers = self.session.headers
         response = self.session.post(
-            endpoints.refresh_url(), headers=headers, timeout=self.timeout
+            self.endpoints.refresh_url(), headers=headers, timeout=self.timeout
         )
         if response.status_code != 200:
             raise Exception("Token refresh failed")
@@ -122,9 +123,9 @@ class Public:
 
     @login_required
     def get_portfolio(self):
-        headers = endpoints.build_headers(self.access_token)
+        headers = self.endpoints.build_headers(self.access_token)
         portfolio = self.session.get(
-            endpoints.portfolio_url(self.account_uuid),
+            self.endpoints.portfolio_url(self.account_uuid),
             headers=headers,
             timeout=self.timeout,
         )
@@ -152,9 +153,9 @@ class Public:
 
     @login_required
     def get_symbol_price(self, symbol):
-        headers = endpoints.build_headers(self.access_token)
+        headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
-            endpoints.get_quote_url(symbol), headers=headers, timeout=self.timeout
+            self.endpoints.get_quote_url(symbol), headers=headers, timeout=self.timeout
         )
         if response.status_code == 400:
             return None
@@ -164,9 +165,9 @@ class Public:
 
     @login_required
     def get_order_quote(self, symbol):
-        headers = endpoints.build_headers(self.access_token)
+        headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
-            endpoints.get_order_quote(symbol), headers=headers, timeout=self.timeout
+            self.endpoints.get_order_quote(symbol), headers=headers, timeout=self.timeout
         )
         if response.status_code == 400:
             return None
@@ -188,7 +189,7 @@ class Public:
         tip=None,
     ):
         # raise NotImplementedError("Place order not implemented yet")
-        headers = endpoints.build_headers(self.access_token, prodApi=True)
+        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
         symbol = symbol.upper()
         time_in_force = time_in_force.upper()
         order_type = order_type.upper()
@@ -215,7 +216,7 @@ class Public:
         }
         # Preflight order endpoint
         preflight = self.session.post(
-            endpoints.preflight_order_url(self.account_uuid),
+            self.endpoints.preflight_order_url(self.account_uuid),
             headers=headers,
             json=payload,
             timeout=self.timeout,
@@ -224,7 +225,7 @@ class Public:
         print(f"Preflight response: {preflight}")
         # Build order endpoint
         build_response = self.session.post(
-            endpoints.build_order_url(self.account_uuid),
+            self.endpoints.build_order_url(self.account_uuid),
             headers=headers,
             json=payload,
             timeout=self.timeout,
@@ -238,7 +239,7 @@ class Public:
         print(f"Order ID: {order_id}")
         if not is_dry_run:
             submit_response = self.session.put(
-                endpoints.submit_put_order_url(self.account_uuid, order_id),
+                self.endpoints.submit_put_order_url(self.account_uuid, order_id),
                 headers=headers,
                 timeout=self.timeout,
             )
@@ -250,7 +251,7 @@ class Public:
             sleep(1)
         # Check if order was rejected
         check_response = self.session.get(
-            endpoints.submit_get_order_url(self.account_uuid, order_id),
+            self.endpoints.submit_get_order_url(self.account_uuid, order_id),
             headers=headers,
             timeout=self.timeout,
         )
