@@ -130,7 +130,9 @@ class Public:
             timeout=self.timeout,
         )
         if portfolio.status_code != 200:
-            raise Exception("Portfolio request failed")
+            print("Portfolio request failed")
+            print(portfolio.text)
+            return None
         return portfolio.json()
 
     @login_required
@@ -149,6 +151,8 @@ class Public:
     @login_required
     def get_account_cash(self):
         account_info = self.get_portfolio()
+        if account_info is None:
+            return None
         return account_info["equity"]["cash"]
 
     @login_required
@@ -157,10 +161,8 @@ class Public:
         response = self.session.get(
             self.endpoints.get_quote_url(symbol), headers=headers, timeout=self.timeout
         )
-        if response.status_code == 400:
-            return None
         if response.status_code != 200:
-            raise Exception("Symbol price request failed")
+            return None
         return response.json()["price"]
 
     @login_required
@@ -171,10 +173,8 @@ class Public:
             headers=headers,
             timeout=self.timeout,
         )
-        if response.status_code == 400:
-            return None
         if response.status_code != 200:
-            raise Exception("Symbol price request failed")
+            return None
         return response.json()
 
     @login_required
@@ -203,7 +203,8 @@ class Public:
             tip = None
         # Need to get quote first
         quote = self.get_order_quote(symbol)
-        print(f"Quote: {quote}")
+        if quote is None:
+            raise Exception(f"Quote not found for {symbol}")
         payload = {
             "symbol": symbol,
             "orderSide": side,
@@ -220,8 +221,10 @@ class Public:
             json=payload,
             timeout=self.timeout,
         )
+        if preflight.status_code != 200:
+            print(preflight.text)
+            raise Exception("Preflight failed")
         preflight = preflight.json()
-        print(f"Preflight response: {preflight}")
         # Build order endpoint
         build_response = self.session.post(
             self.endpoints.build_order_url(self.account_uuid),
@@ -229,19 +232,23 @@ class Public:
             json=payload,
             timeout=self.timeout,
         )
+        if build_response.status_code != 200:
+            print(build_response.text)
+            raise Exception("Build order failed")
         build_response = build_response.json()
-        print(f"Build order response: {build_response}")
         if build_response.get("orderId") is None:
             raise Exception(f"No order ID: {build_response}")
         order_id = build_response["orderId"]
         # Submit order with put
-        print(f"Order ID: {order_id}")
         if not is_dry_run:
             submit_response = self.session.put(
                 self.endpoints.submit_put_order_url(self.account_uuid, order_id),
                 headers=headers,
                 timeout=self.timeout,
             )
+            if submit_response.status_code != 200:
+                print(submit_response.text)
+                raise Exception("Submit order failed")
             submit_response = submit_response.json()
             # Empty dict is success
             if submit_response != {}:
@@ -255,5 +262,10 @@ class Public:
             timeout=self.timeout,
         )
         check_response = check_response.json()
-        print(f"Submit response: {check_response}")
+        check_response["success"] = False
+        # Order doesn't always fill immediately, but one of these should work
+        if check_response["rejectionDetails"] is None:
+            check_response["success"] = True
+        if check_response["status"] == "FILLED":
+            check_response["success"] = True
         return check_response
