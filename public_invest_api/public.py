@@ -77,8 +77,8 @@ class Public:
         response = response.json()
         if response["twoFactorResponse"] is not None:
             self._clear_cookies()
-            last_four = response["twoFactorResponse"]["phoneNumberLastFour"]
-            print(f"2FA required, code sent to phone number ending in {last_four}...")
+            phone = response["twoFactorResponse"]["maskedPhoneNumber"]
+            print(f"2FA required, code sent to phone number {phone}...")
             if not wait_for_2fa and code is None:
                 raise Exception("2FA required: please provide code")
             if code is None:
