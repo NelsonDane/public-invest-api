@@ -38,6 +38,8 @@ class Public:
         filename = self.filename
         if self.path is not None:
             filename = os.path.join(self.path, filename)
+        if self.path is not None and not os.path.exists(self.path):
+            os.makedirs(self.path)
         with open(filename, "wb") as f:
             pickle.dump(self.session.cookies, f)
 
