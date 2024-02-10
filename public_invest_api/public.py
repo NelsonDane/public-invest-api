@@ -65,26 +65,30 @@ class Public:
         if username is None or password is None:
             raise Exception("Username or password not provided")
         headers = self.session.headers
-        payload = self.endpoints.build_payload(username, password)
-        self._load_cookies()
-        response = self.session.post(
-            self.endpoints.login_url(),
-            headers=headers,
-            data=payload,
-            timeout=self.timeout,
-        )
-        if response.status_code != 200:
-            print(response.text)
-            raise Exception("Login failed, check credentials")
-        response = response.json()
-        if response["twoFactorResponse"] is not None:
-            self._clear_cookies()
-            phone = response["twoFactorResponse"]["maskedPhoneNumber"]
-            print(f"2FA required, code sent to phone number {phone}...")
-            if not wait_for_2fa and code is None:
-                raise Exception("2FA required: please provide code")
-            if code is None:
+        need_2fa = True
+        if code is None:
+            payload = self.endpoints.build_payload(username, password)
+            self._load_cookies()
+            response = self.session.post(
+                self.endpoints.login_url(),
+                headers=headers,
+                data=payload,
+                timeout=self.timeout,
+            )
+            if response.status_code != 200:
+                print(response.text)
+                raise Exception("Login failed, check credentials")
+            response = response.json()
+            if response["twoFactorResponse"] is not None:
+                self._clear_cookies()
+                phone = response["twoFactorResponse"]["maskedPhoneNumber"]
+                print(f"2FA required, code sent to phone number {phone}...")
+                if not wait_for_2fa:
+                    raise Exception("2FA required: please provide code")
                 code = input("Enter code: ")
+            else:
+                need_2fa = False
+        if need_2fa:
             payload = self.endpoints.build_payload(username, password, code)
             response = self.session.post(
                 self.endpoints.mfa_url(),
