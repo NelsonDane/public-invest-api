@@ -164,11 +164,14 @@ class Public:
     @login_required
     def get_symbol_price(self, symbol):
         headers = self.endpoints.build_headers(self.access_token)
-        response = self.session.get(
-            self.endpoints.get_quote_url(symbol), headers=headers, timeout=self.timeout
-        )
+        url = self.endpoints.get_quote_url(symbol)
+        if "CRYPTO" in symbol:
+            url = self.endpoints.get_crypto_quote_url(symbol)
+        response = self.session.get(url, headers=headers, timeout=self.timeout)
         if response.status_code != 200:
             return None
+        if "CRYPTO" in symbol:
+            return response.json()["quotes"][0]["last"]
         return response.json()["price"]
 
     @login_required

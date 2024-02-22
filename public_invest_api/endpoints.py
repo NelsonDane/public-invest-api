@@ -24,6 +24,9 @@ class Endpoints:
     def get_quote_url(self, symbol):
         return f"{self.prodapi}/marketdataservice/stockcharts/last-trade/{symbol}"
 
+    def get_crypto_quote_url(self, symbol):
+        return f"{self.prodapi}/cryptoservice/quotes?symbols={symbol}"
+
     def get_order_quote(self, symbol):
         return f"{self.prodapi}/tradingservice/quote/equity/{symbol}"
 
