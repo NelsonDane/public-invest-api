@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="public_invest_api",
-    version="1.0.0",
+    version="1.0.1",
     description="Unofficial Public.com API",
     url="https://github.com/NelsonDane/public-invest-api",
     author="Nelson Dane",
