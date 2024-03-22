@@ -1,0 +1,25 @@
+# Public to PyPI
+name: Publish to PyPI
+on:
+  push:
+    paths:
+      - "setup.py"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/public-invest-api
+    permissions:
+      id-token: write
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build and Publish
+        uses: lsst-sqre/build-and-publish-to-pypi@v2
+        with:
+          python-version: "3.11"
+        
