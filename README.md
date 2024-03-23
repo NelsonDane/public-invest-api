@@ -42,7 +42,7 @@ for position in positions:
     print(position)
 ```
 
-## Place Order
+## Usage: Placing Orders
 
 ```python
 order = public.place_order(
