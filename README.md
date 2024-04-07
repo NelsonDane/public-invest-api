@@ -18,7 +18,7 @@ from public_invest_api import Public
 public = Public()
 public.login(
     username='your_email',
-    password='your_password'
+    password='your_password',
     wait_for_2fa=True # When logging in for the first time, you need to wait for the SMS code
 )
 ```
@@ -50,8 +50,8 @@ order = public.place_order(
     quantity=1,
     side='BUY', # or 'SELL'
     order_type='MARKET', # or 'LIMIT' or 'STOP'
-    time_in_force='DAY' # or 'GTC' or 'IOC' or 'FOK'
-    is_dry_run=False # If True, it will not actually place the order
+    time_in_force='DAY', # or 'GTC' or 'IOC' or 'FOK'
+    is_dry_run=False, # If True, it will not actually place the order
     tip=0 # The amount to tip Public.com
 )
 print(order)
