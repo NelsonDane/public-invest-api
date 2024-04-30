@@ -194,6 +194,7 @@ class Public:
         side,
         order_type,
         time_in_force,
+        limit_price=None,
         is_dry_run=False,
         tip=None,
     ):
@@ -223,6 +224,10 @@ class Public:
             "quantity": quantity,
             "tipAmount": tip,
         }
+        if order_type == "LIMIT":
+            if limit_price is None:
+                raise Exception("Limit price required for limit orders")
+            payload["limitPrice"] = float(limit_price)
         # Preflight order endpoint
         preflight = self.session.post(
             self.endpoints.preflight_order_url(self.account_uuid),
@@ -243,7 +248,7 @@ class Public:
         )
         if build_response.status_code != 200:
             print(build_response.text)
-            raise Exception("Build order failed")
+            raise Exception(f"Build order failed - {build_response.text}")
         build_response = build_response.json()
         if build_response.get("orderId") is None:
             raise Exception(f"No order ID: {build_response}")
