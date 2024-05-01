@@ -136,8 +136,7 @@ class Public:
             timeout=self.timeout,
         )
         if portfolio.status_code != 200:
-            print("Portfolio request failed")
-            print(portfolio.text)
+            print(f"Portfolio request failed: {portfolio.text}")
             return None
         return portfolio.json()
 
@@ -236,8 +235,7 @@ class Public:
             timeout=self.timeout,
         )
         if preflight.status_code != 200:
-            print(preflight.text)
-            raise Exception("Preflight failed")
+            raise Exception(f"Preflight failed: {preflight.text}")
         preflight = preflight.json()
         # Build order endpoint
         build_response = self.session.post(
@@ -247,7 +245,6 @@ class Public:
             timeout=self.timeout,
         )
         if build_response.status_code != 200:
-            print(build_response.text)
             raise Exception(f"Build order failed: {build_response.text}")
         build_response = build_response.json()
         if build_response.get("orderId") is None:
@@ -261,12 +258,10 @@ class Public:
                 timeout=self.timeout,
             )
             if submit_response.status_code != 200:
-                print(submit_response.text)
-                raise Exception("Submit order failed")
+                raise Exception(f"Submit order failed: {submit_response.text}")
             submit_response = submit_response.json()
             # Empty dict is success
             if submit_response != {}:
-                print(f"Submit response: {submit_response}")
                 raise Exception(f"Order failed: {submit_response}")
             sleep(1)
         # Check if order was rejected
