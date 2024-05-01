@@ -248,7 +248,7 @@ class Public:
         )
         if build_response.status_code != 200:
             print(build_response.text)
-            raise Exception(f"Build order failed - {build_response.text}")
+            raise Exception(f"Build order failed: {build_response.text}")
         build_response = build_response.json()
         if build_response.get("orderId") is None:
             raise Exception(f"No order ID: {build_response}")
