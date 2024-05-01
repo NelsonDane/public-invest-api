@@ -50,6 +50,7 @@ order = public.place_order(
     quantity=1,
     side='BUY', # or 'SELL'
     order_type='MARKET', # or 'LIMIT' or 'STOP'
+    limit_price=None # pass float if using 'LIMIT' order_type
     time_in_force='DAY', # or 'GTC' or 'IOC' or 'FOK'
     is_dry_run=False, # If True, it will not actually place the order
     tip=0 # The amount to tip Public.com
