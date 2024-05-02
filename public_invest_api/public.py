@@ -278,3 +278,35 @@ class Public:
         if check_response["status"] == "FILLED":
             check_response["success"] = True
         return check_response
+    
+    @login_required
+    def get_pending_orders(self):
+        headers = self.endpoints.build_headers(self.access_token)
+        response = self.session.get(
+            self.endpoints.get_pending_orders_url(self.account_uuid),
+            headers=headers,
+            timeout=self.timeout,
+        )
+        if response.status_code != 200:
+            return None
+        return response.json()
+
+    @login_required
+    def cancel_order(self, order_id):
+        headers = self.endpoints.build_headers(self.access_token)
+        preflight = self.session.options(
+            self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
+            headers=headers,
+            timeout=self.timeout,
+        )
+        if preflight.status_code != 200:
+            raise Exception(f"Preflight failed: {preflight.text}")
+
+        response = self.session.delete(
+            self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
+            headers=headers,
+            timeout=self.timeout,
+        )
+        if response.status_code != 200:
+            return None
+        return response.json()
