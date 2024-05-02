@@ -46,7 +46,7 @@ class Endpoints:
         return f"{self.prodapi}/hstier2service/history?&&status=PENDING&type=ALL&accountUuids={account_uuid}"
 
     def cancel_pending_order_url(self, account_uuid, order_id):
-        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}/cancel"
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
     @staticmethod
     def build_headers(auth=None, prodApi=False):
