@@ -278,7 +278,7 @@ class Public:
         if check_response["status"] == "FILLED":
             check_response["success"] = True
         return check_response
-    
+
     @login_required
     def get_pending_orders(self):
         headers = self.endpoints.build_headers(self.access_token)
