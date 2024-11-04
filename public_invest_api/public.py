@@ -9,6 +9,16 @@ from public_invest_api.endpoints import Endpoints
 
 def login_required(func):
     def wrapper(self, *args, **kwargs):
+        """
+        A wrapper function that checks if the user is logged in
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        Raises:
+            Exception: If the user is not logged in (i.e., access_token is None).
+        Returns:
+            The result of the function `func` if the user is logged in.
+        """
         if self.access_token is None:
             raise Exception("Login required")
         return func(self, *args, **kwargs)
@@ -34,7 +44,10 @@ class Public:
             self.path = path
         self._load_cookies()
 
-    def _save_cookies(self):
+    def _save_cookies(self) -> None:
+        """
+        Save cookies to file
+        """
         filename = self.filename
         if self.path is not None:
             filename = os.path.join(self.path, filename)
@@ -43,7 +56,12 @@ class Public:
         with open(filename, "wb") as f:
             pickle.dump(self.session.cookies, f)
 
-    def _load_cookies(self):
+    def _load_cookies(self) -> bool:
+        """
+        Load cookies from file
+        Returns:
+            bool: True if cookies were loaded, False otherwise
+        """
         filename = self.filename
         if self.path is not None:
             filename = os.path.join(self.path, filename)
@@ -53,7 +71,10 @@ class Public:
             self.session.cookies.update(pickle.load(f))
         return True
 
-    def _clear_cookies(self):
+    def _clear_cookies(self) -> None:
+        """
+        Clear cookies and remove file
+        """
         filename = self.filename
         if self.path is not None:
             filename = os.path.join(self.path, filename)
@@ -61,7 +82,19 @@ class Public:
             os.remove(filename)
         self.session.cookies.clear()
 
-    def login(self, username=None, password=None, wait_for_2fa=True, code=None):
+    def login(self, username=None, password=None, wait_for_2fa=True, code=None) -> dict:
+        """
+        Logs in to the Public.com API by making a POST request to the login URL.
+        Args:
+            username (str): The email to log in with.
+            password (str): The password to log in with.
+            wait_for_2fa (bool): Whether to wait for 2FA code to be entered or raise exception.
+            code (str): The 2FA code to enter when re-calling login.
+        Returns:
+            dict: The JSON response from the login URL containing the access token.
+        Raises:
+            Exception: If the login fails (i.e., response status code is not 200).
+        """
         if username is None or password is None:
             raise Exception("Username or password not provided")
         headers = self.session.headers
@@ -115,7 +148,14 @@ class Public:
         return response
 
     @login_required
-    def _refresh_token(self):
+    def _refresh_token(self) -> dict:
+        """
+        Refreshes the access token by making a POST request to the refresh URL.
+        Returns:
+            dict: The JSON response from the refresh URL containing the new access token.
+        Raises:
+            Exception: If the token refresh fails (i.e., response status code is not 200 or 2FA is required).
+        """
         headers = self.session.headers
         response = self.session.post(
             self.endpoints.refresh_url(), headers=headers, timeout=self.timeout
@@ -128,7 +168,14 @@ class Public:
         return response
 
     @login_required
-    def get_portfolio(self):
+    def get_portfolio(self) -> dict:
+        """
+        Gets the user's portfolio by making a GET request to the portfolio URL.
+        Returns:
+            dict: The JSON response from the portfolio URL containing the user's portfolio.
+        Raises:
+            Exception: If the portfolio request fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token)
         portfolio = self.session.get(
             self.endpoints.portfolio_url(self.account_uuid),
@@ -136,21 +183,39 @@ class Public:
             timeout=self.timeout,
         )
         if portfolio.status_code != 200:
-            print(f"Portfolio request failed: {portfolio.text}")
-            return None
+            raise Exception(f"Portfolio request failed: {portfolio.text}")
         return portfolio.json()
 
     @login_required
-    def get_account_number(self):
+    def get_account_number(self) -> str:
+        """
+        Gets the user's account number.
+        Returns:
+            str: The user's account number.
+        """
         return self.account_number
 
     @login_required
-    def get_positions(self):
+    def get_positions(self) -> list:
+        """
+        Gets the user's positions by making a GET request to the positions URL.
+        Returns:
+            list: The JSON response from the positions URL containing the user's positions.
+        Raises:
+            Exception: If the positions request fails (i.e., response status code is not 200).
+        """
         account_info = self.get_portfolio()
         return account_info["positions"]
 
     @login_required
-    def is_stock_owned(self, symbol):
+    def is_stock_owned(self, symbol) -> bool:
+        """
+        Checks if the user owns a stock by checking the user's positions.
+        Args:
+            symbol (str): The stock symbol to check.
+        Returns:
+            bool: True if the user owns the stock, False otherwise.
+        """
         positions = self.get_positions()
         for position in positions:
             if position["instrument"]["symbol"] == symbol:
@@ -158,7 +223,16 @@ class Public:
         return False
 
     @login_required
-    def get_owned_stock_quantity(self, symbol):
+    def get_owned_stock_quantity(self, symbol) -> float | None:
+        """
+        Gets the quantity of a stock owned by the user.
+        Args:
+            symbol (str): The stock symbol to check.
+        Returns:
+            float: The quantity of the stock owned by the user.
+        Raises:
+            Exception: If the stock is not owned by the user.
+        """
         if not self.is_stock_owned(symbol):
             raise Exception(f"Stock {symbol} is not owned")
         positions = self.get_positions()
@@ -168,31 +242,57 @@ class Public:
         return None
 
     @login_required
-    def get_account_type(self):
+    def get_account_type(self) -> str:
+        """
+        Gets the user's account type.
+        Returns:
+            str: The user's account type.
+        """
         return self.all_login_info["loginResponse"]["accounts"][0]["type"]
 
     @login_required
-    def get_account_cash(self):
+    def get_account_cash(self) -> float:
+        """
+        Gets the user's account cash balance.
+        Returns:
+            float: The user's account cash balance.
+        """
         account_info = self.get_portfolio()
-        if account_info is None:
-            return None
         return account_info["equity"]["cash"]
 
     @login_required
-    def get_symbol_price(self, symbol):
+    def get_symbol_price(self, symbol) -> float:
+        """
+        Gets the price of a stock by making a GET request to the quote URL.
+        Args:
+            symbol (str): The stock symbol to get the price of.
+        Returns:
+            float: The price of the stock.
+        Raises:
+            Exception: If the quote request fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token)
         url = self.endpoints.get_quote_url(symbol)
         if "CRYPTO" in symbol:
             url = self.endpoints.get_crypto_quote_url(symbol)
         response = self.session.get(url, headers=headers, timeout=self.timeout)
         if response.status_code != 200:
-            return None
+            raise Exception(f"Quote request failed: {response.text}")
         if "CRYPTO" in symbol:
             return response.json()["quotes"][0]["last"]
         return response.json()["price"]
 
     @login_required
-    def get_order_quote(self, symbol):
+    def get_order_quote(self, symbol) -> dict:
+        """
+        Gets a quote for an order by making a GET request to the order quote URL.
+        Args:
+            symbol (str): The stock symbol to get the order quote for.
+        Returns:
+            dict: The JSON response from the order quote URL containing the order quote.
+        Raises:
+            Exception: If the quote request fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
             self.endpoints.get_order_quote(symbol),
@@ -200,7 +300,7 @@ class Public:
             timeout=self.timeout,
         )
         if response.status_code != 200:
-            return None
+            raise Exception(f"Quote request failed: {response.text}")
         return response.json()
 
     @login_required
@@ -214,7 +314,23 @@ class Public:
         limit_price=None,
         is_dry_run=False,
         tip=None,
-    ):
+    ) -> dict:
+        """
+        Places an order by making a POST request to the build order URL.
+        Args:
+            symbol (str): The stock symbol to place the order for.
+            quantity (float): The quantity of the stock to buy or sell, or "all" to sell all owned stock.
+            side (str): The side of the order (BUY or SELL).
+            order_type (str): The type of the order (MARKET, LIMIT, or STOP).
+            time_in_force (str): The time in force of the order (DAY, GTC, IOC, or FOK).
+            limit_price (float): The limit price of the order (required for limit orders).
+            is_dry_run (bool): Whether to simulate the order without submitting it.
+            tip (float): The tip amount for the order.
+        Returns:
+            dict: The JSON response from the build order URL containing the order details.
+        Raises:
+            Exception: If the order fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token, prodApi=True)
         symbol = symbol.upper()
         time_in_force = time_in_force.upper()
@@ -236,6 +352,9 @@ class Public:
                 quantity = self.get_owned_stock_quantity(symbol)
             if quantity > self.get_owned_stock_quantity(symbol):
                 raise Exception(f"Quantity exceeds owned stock for {symbol}")
+        # What are they doing?
+        if side == "BUY" and isinstance(quantity, str) and quantity.lower() == "all":
+            raise Exception("Cannot buy all stock")
         # Need to get quote first
         quote = self.get_order_quote(symbol)
         if quote is None:
@@ -306,7 +425,14 @@ class Public:
         return check_response
 
     @login_required
-    def get_pending_orders(self):
+    def get_pending_orders(self) -> dict:
+        """
+        Gets the user's pending orders by making a GET request to the pending orders URL.
+        Returns:
+            dict: The JSON response from the pending orders URL containing the user's pending orders.
+        Raises:
+            Exception: If the pending orders request fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
             self.endpoints.get_pending_orders_url(self.account_uuid),
@@ -314,11 +440,20 @@ class Public:
             timeout=self.timeout,
         )
         if response.status_code != 200:
-            return None
+            raise Exception(f"Pending orders request failed: {response.text}")
         return response.json()
 
     @login_required
-    def cancel_order(self, order_id):
+    def cancel_order(self, order_id) -> dict:
+        """
+        Cancels an order by making a DELETE request to the cancel order URL.
+        Args:
+            order_id (str): The order ID to cancel.
+        Returns:
+            dict: The JSON response from the cancel order URL containing the order details.
+        Raises:
+            Exception: If the cancel order fails (i.e., response status code is not 200).
+        """
         headers = self.endpoints.build_headers(self.access_token)
         preflight = self.session.options(
             self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
@@ -327,12 +462,11 @@ class Public:
         )
         if preflight.status_code != 200:
             raise Exception(f"Preflight failed: {preflight.text}")
-
         response = self.session.delete(
             self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
             headers=headers,
             timeout=self.timeout,
         )
         if response.status_code != 200:
-            return None
+            raise Exception(f"Cancel order failed: {response.text}")
         return response.json()
