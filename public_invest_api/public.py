@@ -150,6 +150,24 @@ class Public:
         return account_info["positions"]
 
     @login_required
+    def is_stock_owned(self, symbol):
+        positions = self.get_positions()
+        for position in positions:
+            if position["instrument"]["symbol"] == symbol:
+                return True
+        return False
+
+    @login_required
+    def get_owned_stock_quantity(self, symbol):
+        if not self.is_stock_owned(symbol):
+            raise Exception(f"Stock {symbol} is not owned")
+        positions = self.get_positions()
+        for position in positions:
+            if position["instrument"]["symbol"] == symbol:
+                return float(position["quantity"])
+        return None
+
+    @login_required
     def get_account_type(self):
         return self.all_login_info["loginResponse"]["accounts"][0]["type"]
 
@@ -210,6 +228,14 @@ class Public:
             raise Exception(f"Invalid side: {side}")
         if tip == 0:
             tip = None
+        # If sell, check safeguards
+        if side == "SELL":
+            if not self.is_stock_owned(symbol):
+                raise Exception(f"Stock {symbol} is not owned")
+            if isinstance(quantity, str) and quantity.lower() == "all":
+                quantity = self.get_owned_stock_quantity(symbol)
+            if quantity > self.get_owned_stock_quantity(symbol):
+                raise Exception(f"Quantity exceeds owned stock for {symbol}")
         # Need to get quote first
         quote = self.get_order_quote(symbol)
         if quote is None:
