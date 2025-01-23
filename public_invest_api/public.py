@@ -188,7 +188,8 @@ class Public:
             raise Exception(f"Portfolio request failed: {portfolio.text}")
         return portfolio.json()
 
-    def _history_filter_date(self, date: str) -> dict:
+    @staticmethod
+    def _history_filter_date(date: str) -> dict:
         """
         Returns the start and end date for the given date range.
         Args:
@@ -227,7 +228,7 @@ class Public:
         asset_class="all",
         min_amount=None,
         max_amount=None,
-        type="all",
+        transaction_type="all",
         status="all",
         nextToken=None,
     ) -> dict:
@@ -239,7 +240,7 @@ class Public:
             asset_class (str or list, optional): The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: ["stocks_and_etfs", "options"].
             min_amount (int, optional): The minimum amount. If both min_amount and max_amount are None, no filter is applied.
             max_amount (int, optional): The maximum amount. If both min_amount and max_amount are None, no filter is applied.
-            type (str or list, optional): The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
+            transaction_type (str or list, optional): The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
             status (str or list, optional): The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: ["completed", "rejected"].
         Returns:
             dict: The JSON response from the account history URL containing the user's account history.
@@ -269,13 +270,13 @@ class Public:
                 ]:
                     raise Exception(f"Invalid asset class: {asset}")
         if min_amount is not None and not isinstance(min_amount, int):
-            raise Exception(f"Invalid min amount. Must be int.")
+            raise Exception("Invalid min amount. Must be int.")
         if max_amount is not None and not isinstance(max_amount, int):
-            raise Exception(f"Invalid max amount. Must be int.")
-        if type != "all":
-            if not isinstance(type, list):
-                type = [type]
-            for t in type:
+            raise Exception("Invalid max amount. Must be int.")
+        if transaction_type != "all":
+            if not isinstance(transaction_type, list):
+                transaction_type = [transaction_type]
+            for t in transaction_type:
                 if t not in [
                     "all",
                     "buy",
@@ -317,7 +318,7 @@ class Public:
         if max_amount is not None:
             params["amountLessThanEqualTo"] = max_amount
         # Type filter
-        if type != "all":
+        if transaction_type != "all":
             type_map = {
                 "buy": "PURCHASE",
                 "sell": "SALE",
@@ -332,7 +333,7 @@ class Public:
                 "subscription": "SUBSCRIPTION",
                 "misc": "OTHER",
             }
-            params["type"] = [type_map[t] for t in type]
+            params["type"] = [type_map[t] for t in transaction_type]
         # Status filter
         if status != "all":
             params["status"] = [s.upper() for s in status]
