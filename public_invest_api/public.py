@@ -6,6 +6,8 @@ import requests
 
 from public_invest_api.endpoints import Endpoints
 
+from datetime import datetime
+import calendar
 
 def login_required(func):
     def wrapper(self, *args, **kwargs):
@@ -185,6 +187,139 @@ class Public:
         if portfolio.status_code != 200:
             raise Exception(f"Portfolio request failed: {portfolio.text}")
         return portfolio.json()
+
+    def _history_filter_date(self, date: str) -> dict:
+        """
+        Returns the start and end date for the given date range.
+        Args:
+            date (str): The date range (all, current_month, last_month, this_year, last_year).
+        Returns:
+            dict: The start and end date for the given date range in the format yyyy-mm-dd.
+        """
+        if date == "all":
+            return {}
+        now = datetime.now()
+        if date == "current_month":
+            start_date = datetime(now.year, now.month, 1)
+            end_date = datetime(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
+        elif date == "last_month":
+            start_date = datetime(now.year, now.month - 1, 1)
+            end_date = datetime(now.year, now.month - 1, calendar.monthrange(now.year, now.month - 1)[1])
+        elif date == "this_year":
+            start_date = datetime(now.year, 1, 1)
+            end_date = datetime(now.year, 12, 31)
+        elif date == "last_year":
+            start_date = datetime(now.year - 1, 1, 1)
+            end_date = datetime(now.year - 1, 12, 31)
+        return {
+            "startDate": start_date.strftime("%Y-%m-%d"),
+            "endDate": end_date.strftime("%Y-%m-%d"),
+        }
+
+    @login_required
+    def get_account_history(
+            self,
+            date="all",
+            asset_class="all",
+            min_amount=None,
+            max_amount=None,
+            type="all",
+            status="all",
+            nextToken=None
+        ) -> dict:
+        """
+        Returns the user's account history from https://public.com/settings/history.
+        The filters match the filters on the website.
+        Args:
+            date (str, optional): The date range (all, current_month, last_month, this_year, last_year).
+            asset_class (str or list, optional): The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: ["stocks_and_etfs", "options"].
+            min_amount (int, optional): The minimum amount. If both min_amount and max_amount are None, no filter is applied.
+            max_amount (int, optional): The maximum amount. If both min_amount and max_amount are None, no filter is applied.
+            type (str or list, optional): The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
+            status (str or list, optional): The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: ["completed", "rejected"].
+        Returns:
+            dict: The JSON response from the account history URL containing the user's account history.
+                - pendingTransactions (list): A list of pending transactions.
+                - transactions (list): A list of transactions.
+                - accountCreated (bool?): Whether the account was created? Not sure, mine is null.
+                - nextToken (str): The next token for pagination.
+        Raises:
+            Exception: If the account history request fails (i.e., response status code is not 200).
+        """
+        headers = self.endpoints.build_headers(self.access_token)
+        url = self.endpoints.account_history_url(self.account_uuid)
+        params = {}
+        # Verifications
+        if date not in ["all", "current_month", "last_month", "this_year", "last_year"]:
+            raise Exception(f"Invalid date: {date}")
+        if asset_class != "all":
+            if not isinstance(asset_class, list):
+                asset_class = [asset_class]
+            for asset in asset_class:
+                if asset not in ["all", "stocks_and_etfs", "options", "bonds", "crypto"]:
+                    raise Exception(f"Invalid asset class: {asset}")
+        if min_amount is not None and not isinstance(min_amount, int):
+            raise Exception(f"Invalid min amount. Must be int.")
+        if max_amount is not None and not isinstance(max_amount, int):
+            raise Exception(f"Invalid max amount. Must be int.")
+        if type != "all":
+            if not isinstance(type, list):
+                type = [type]
+            for t in type:
+                if t not in ["all", "buy", "sell", "multi_leg", "deposit", "withdrawal", "6m_treasury_bills", "acat", "option_event", "interest_dividend_maturity", "reward", "subscription", "misc"]:
+                    raise Exception(f"Invalid type: {t}")
+        if status != "all":
+            if not isinstance(status, list):
+                status = [status]
+            for s in status:
+                if s not in ["all", "completed", "rejected", "cancelled", "pending"]:
+                    raise Exception(f"Invalid status: {s}")
+        # Date filter
+        date_params = self._history_filter_date(date)
+        if date_params != {}:
+            params.update(date_params)
+        # Asset class filter
+        if asset_class != "all":
+            asset_class_map = {
+                "stocks_and_etfs": "EQUITY",
+                "options": "OPTION",
+                "bonds": "BOND",
+                "crypto": "CRYPTO",
+            }
+            params["assetClass"] = [asset_class_map[asset] for asset in asset_class]
+        # Amount filter
+        if min_amount is not None:
+            params["amountGreaterThanEqualTo"] = min_amount
+        if max_amount is not None:
+            params["amountLessThanEqualTo"] = max_amount
+        # Type filter
+        if type != "all":
+            type_map = {
+                "buy": "PURCHASE",
+                "sell": "SALE",
+                "multi_leg": "MULTI_LEG_ORDER",
+                "deposit": "DEPOSIT",
+                "withdrawal": "WITHDRAWAL",
+                "6m_treasury_bills": "TREASURY_ACCOUNT_TRANSFER",
+                "acat": "ACAT",
+                "option_event": "OPTION_EVENTS",
+                "interest_dividend_maturity": "INTEREST",
+                "reward": "STOCK_REWARD",
+                "subscription": "SUBSCRIPTION",
+                "misc": "OTHER",
+            }
+            params["type"] = [type_map[t] for t in type]
+        # Status filter
+        if status != "all":
+            params["status"] = [s.upper() for s in status]
+        # Next token
+        if nextToken is not None:
+            params["nextToken"] = nextToken
+        # Make the request
+        response = self.session.get(url, headers=headers, params=params, timeout=self.timeout)
+        if response.status_code != 200:
+            raise Exception(f"Account history request failed: {response.text}")
+        return response.json()
 
     @login_required
     def get_account_number(self) -> str:

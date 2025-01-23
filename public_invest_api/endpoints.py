@@ -21,6 +21,9 @@ class Endpoints:
     def portfolio_url(self, account_uuid):
         return f"{self.prodapi}/hstier1service/account/{account_uuid}/portfolio"
 
+    def account_history_url(self, account_uuid):
+        return f"{self.prodapi}/hstier2service/history?accountUuids={account_uuid}"
+
     def get_quote_url(self, symbol):
         return f"{self.prodapi}/marketdataservice/stockcharts/last-trade/{symbol}"
 
@@ -53,10 +56,10 @@ class Endpoints:
         headers = {
             "authority": "public.com",
             "accept": "*/*",
-            "accept-language": "en-US,en;q=0.5",
+            "accept-language": "en-US,en;q=0.8",
             "content-type": "application/json",
             "origin": "https://public.com",
-            "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Brave";v="120"',
+            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132", "Brave";v="132"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"macOS"',
             "sec-fetch-dest": "empty",
@@ -68,7 +71,7 @@ class Endpoints:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
-            "x-app-version": "web-1.0.9",
+            "x-app-version": "web-1.0.10",
         }
         if auth is not None:
             headers["authorization"] = auth
