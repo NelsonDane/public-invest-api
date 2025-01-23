@@ -1,13 +1,13 @@
+import calendar
 import os
 import pickle
+from datetime import datetime
 from time import sleep
 
 import requests
 
 from public_invest_api.endpoints import Endpoints
 
-from datetime import datetime
-import calendar
 
 def login_required(func):
     def wrapper(self, *args, **kwargs):
@@ -201,10 +201,14 @@ class Public:
         now = datetime.now()
         if date == "current_month":
             start_date = datetime(now.year, now.month, 1)
-            end_date = datetime(now.year, now.month, calendar.monthrange(now.year, now.month)[1])
+            end_date = datetime(
+                now.year, now.month, calendar.monthrange(now.year, now.month)[1]
+            )
         elif date == "last_month":
             start_date = datetime(now.year, now.month - 1, 1)
-            end_date = datetime(now.year, now.month - 1, calendar.monthrange(now.year, now.month - 1)[1])
+            end_date = datetime(
+                now.year, now.month - 1, calendar.monthrange(now.year, now.month - 1)[1]
+            )
         elif date == "this_year":
             start_date = datetime(now.year, 1, 1)
             end_date = datetime(now.year, 12, 31)
@@ -218,15 +222,15 @@ class Public:
 
     @login_required
     def get_account_history(
-            self,
-            date="all",
-            asset_class="all",
-            min_amount=None,
-            max_amount=None,
-            type="all",
-            status="all",
-            nextToken=None
-        ) -> dict:
+        self,
+        date="all",
+        asset_class="all",
+        min_amount=None,
+        max_amount=None,
+        type="all",
+        status="all",
+        nextToken=None,
+    ) -> dict:
         """
         Returns the user's account history from https://public.com/settings/history.
         The filters match the filters on the website.
@@ -256,7 +260,13 @@ class Public:
             if not isinstance(asset_class, list):
                 asset_class = [asset_class]
             for asset in asset_class:
-                if asset not in ["all", "stocks_and_etfs", "options", "bonds", "crypto"]:
+                if asset not in [
+                    "all",
+                    "stocks_and_etfs",
+                    "options",
+                    "bonds",
+                    "crypto",
+                ]:
                     raise Exception(f"Invalid asset class: {asset}")
         if min_amount is not None and not isinstance(min_amount, int):
             raise Exception(f"Invalid min amount. Must be int.")
@@ -266,7 +276,21 @@ class Public:
             if not isinstance(type, list):
                 type = [type]
             for t in type:
-                if t not in ["all", "buy", "sell", "multi_leg", "deposit", "withdrawal", "6m_treasury_bills", "acat", "option_event", "interest_dividend_maturity", "reward", "subscription", "misc"]:
+                if t not in [
+                    "all",
+                    "buy",
+                    "sell",
+                    "multi_leg",
+                    "deposit",
+                    "withdrawal",
+                    "6m_treasury_bills",
+                    "acat",
+                    "option_event",
+                    "interest_dividend_maturity",
+                    "reward",
+                    "subscription",
+                    "misc",
+                ]:
                     raise Exception(f"Invalid type: {t}")
         if status != "all":
             if not isinstance(status, list):
@@ -316,7 +340,9 @@ class Public:
         if nextToken is not None:
             params["nextToken"] = nextToken
         # Make the request
-        response = self.session.get(url, headers=headers, params=params, timeout=self.timeout)
+        response = self.session.get(
+            url, headers=headers, params=params, timeout=self.timeout
+        )
         if response.status_code != 200:
             raise Exception(f"Account history request failed: {response.text}")
         return response.json()
