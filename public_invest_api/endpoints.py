@@ -56,7 +56,7 @@ class Endpoints:
             "accept-language": "en-US,en;q=0.5",
             "content-type": "application/json",
             "origin": "https://public.com",
-            "sec-ch-ua": '"Not_A Brand";v="8", "Chromium";v="120", "Brave";v="120"',
+            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132", "Brave";v="132"',
             "sec-ch-ua-mobile": "?0",
             "sec-ch-ua-platform": '"macOS"',
             "sec-fetch-dest": "empty",
