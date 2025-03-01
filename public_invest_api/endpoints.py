@@ -68,7 +68,7 @@ class Endpoints:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
-            "x-app-version": "web-1.0.9",
+            "x-app-version": "web-1.0.11",
         }
         if auth is not None:
             headers["authorization"] = auth
