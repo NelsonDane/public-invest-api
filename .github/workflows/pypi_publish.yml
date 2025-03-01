@@ -2,6 +2,8 @@
 name: Publish to PyPI
 on:
   push:
+    branches:
+      - main
     paths:
       - "setup.py"
 
