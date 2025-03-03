@@ -150,7 +150,7 @@ class Public:
         return response
 
     @login_required
-    def _refresh_token(self) -> dict:
+    def refresh_token(self) -> dict:
         """
         Refreshes the access token by making a POST request to the refresh URL.
         Returns:
