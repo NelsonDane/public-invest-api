@@ -28,6 +28,25 @@ def login_required(func):
     return wrapper
 
 
+def refresh_check(func):
+    def wrapper(self, *args, **kwargs):
+        """
+        A wrapper function that checks if the access token needs to be refreshed
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+        Raises:
+            Exception: If the access token refresh fails (i.e., response status code is not 200).
+        Returns:
+            The result of the function `func` if the access token does not need to be refreshed.
+        """
+        if self.expires_at is not None and datetime.now().timestamp() > self.expires_at:
+            self._refresh_token()
+        return func(self, *args, **kwargs)
+
+    return wrapper
+
+
 class Public:
     def __init__(self, filename=None, path=None):
         self.session = requests.Session()
@@ -38,6 +57,7 @@ class Public:
         self.account_number = None
         self.all_login_info = None
         self.timeout = 10
+        self.expires_at = None
         self.filename = "public_credentials.pkl"
         if filename is not None:
             self.filename = filename
@@ -111,6 +131,15 @@ class Public:
                 timeout=self.timeout,
             )
             if response.status_code != 200:
+                # Perhaps cookies are expired
+                self._clear_cookies()
+                response = self.session.post(
+                    self.endpoints.login_url(),
+                    headers=headers,
+                    data=payload,
+                    timeout=self.timeout,
+                )
+            if response.status_code != 200:
                 print(response.text)
                 raise Exception("Login failed, check credentials")
             response = response.json()
@@ -145,12 +174,13 @@ class Public:
         self.access_token = response["loginResponse"]["accessToken"]
         self.account_uuid = response["loginResponse"]["accounts"][0]["accountUuid"]
         self.account_number = response["loginResponse"]["accounts"][0]["account"]
+        self.expires_at = (int(response["loginResponse"]["serverTime"]) / 1000) + int(response["loginResponse"]["expiresIn"])
         self.all_login_info = response
         self._save_cookies()
         return response
 
     @login_required
-    def refresh_token(self) -> dict:
+    def _refresh_token(self) -> dict:
         """
         Refreshes the access token by making a POST request to the refresh URL.
         Returns:
@@ -166,10 +196,13 @@ class Public:
             raise Exception("Token refresh failed")
         response = response.json()
         self.access_token = response["accessToken"]
+        self.expires_at = (int(response["serverTime"]) / 1000) + int(response["expiresIn"])
+        self.account_uuid = response["accounts"][0]["accountUuid"]
         self._save_cookies()
         return response
 
     @login_required
+    @refresh_check
     def get_portfolio(self) -> dict:
         """
         Gets the user's portfolio by making a GET request to the portfolio URL.
@@ -178,7 +211,7 @@ class Public:
         Raises:
             Exception: If the portfolio request fails (i.e., response status code is not 200).
         """
-        headers = self.endpoints.build_headers(self.access_token)
+        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
         portfolio = self.session.get(
             self.endpoints.portfolio_url(self.account_uuid),
             headers=headers,
@@ -222,6 +255,7 @@ class Public:
         }
 
     @login_required
+    @refresh_check
     def get_account_history(
         self,
         date="all",
@@ -423,6 +457,7 @@ class Public:
         return account_info["equity"]["cash"]
 
     @login_required
+    @refresh_check
     def get_symbol_price(self, symbol) -> float:
         """
         Gets the price of a stock by making a GET request to the quote URL.
@@ -445,6 +480,7 @@ class Public:
         return response.json()["price"]
 
     @login_required
+    @refresh_check
     def get_order_quote(self, symbol) -> dict:
         """
         Gets a quote for an order by making a GET request to the order quote URL.
@@ -466,6 +502,7 @@ class Public:
         return response.json()
 
     @login_required
+    @refresh_check
     def place_order(
         self,
         symbol,
@@ -587,6 +624,7 @@ class Public:
         return check_response
 
     @login_required
+    @refresh_check
     def get_pending_orders(self) -> dict:
         """
         Gets the user's pending orders by making a GET request to the pending orders URL.
@@ -606,6 +644,7 @@ class Public:
         return response.json()
 
     @login_required
+    @refresh_check
     def cancel_order(self, order_id) -> dict:
         """
         Cancels an order by making a DELETE request to the cancel order URL.

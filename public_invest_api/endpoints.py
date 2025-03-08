@@ -51,8 +51,7 @@ class Endpoints:
     def cancel_pending_order_url(self, account_uuid, order_id):
         return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
-    @staticmethod
-    def build_headers(auth=None, prodApi=False):
+    def build_headers(self, auth=None, prodApi=False):
         headers = {
             "authority": "public.com",
             "accept": "*/*",
@@ -76,7 +75,7 @@ class Endpoints:
         if auth is not None:
             headers["authorization"] = auth
         if prodApi:
-            headers["authority"] = "prod-api.154310543964.hellopublic.com"
+            headers["authority"] = self.prodapi.replace("https://", "")
             headers["sec-fetch-site"] = "cross-site"
         return headers
 
