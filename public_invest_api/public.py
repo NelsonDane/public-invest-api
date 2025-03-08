@@ -174,7 +174,9 @@ class Public:
         self.access_token = response["loginResponse"]["accessToken"]
         self.account_uuid = response["loginResponse"]["accounts"][0]["accountUuid"]
         self.account_number = response["loginResponse"]["accounts"][0]["account"]
-        self.expires_at = (int(response["loginResponse"]["serverTime"]) / 1000) + int(response["loginResponse"]["expiresIn"])
+        self.expires_at = (int(response["loginResponse"]["serverTime"]) / 1000) + int(
+            response["loginResponse"]["expiresIn"]
+        )
         self.all_login_info = response
         self._save_cookies()
         return response
@@ -196,7 +198,9 @@ class Public:
             raise Exception("Token refresh failed")
         response = response.json()
         self.access_token = response["accessToken"]
-        self.expires_at = (int(response["serverTime"]) / 1000) + int(response["expiresIn"])
+        self.expires_at = (int(response["serverTime"]) / 1000) + int(
+            response["expiresIn"]
+        )
         self.account_uuid = response["accounts"][0]["accountUuid"]
         self._save_cookies()
         return response
