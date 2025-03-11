@@ -584,7 +584,6 @@ class Public:
         )
         if preflight.status_code != 200:
             raise Exception(f"Preflight failed: {preflight.text}")
-        preflight = preflight.json()
         # Build order endpoint
         build_response = self.session.post(
             self.endpoints.build_order_url(self.account_uuid),
