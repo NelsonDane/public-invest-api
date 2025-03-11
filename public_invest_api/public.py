@@ -710,8 +710,12 @@ class Public:
         Returns:
             str: The option symbol for the given parameters.
         """
-        formatted_strike = f"{int(float(strike_price) * 1000):08d}" # 8 digits padded, in cents
-        formatted_date = datetime.strptime(expiration_date, "%Y-%m-%d").strftime("%y%m%d")
+        formatted_strike = (
+            f"{int(float(strike_price) * 1000):08d}"  # 8 digits padded, in cents
+        )
+        formatted_date = datetime.strptime(expiration_date, "%Y-%m-%d").strftime(
+            "%y%m%d"
+        )
         return f"{stock_symbol.upper()}{formatted_date}{option_type.upper()}{formatted_strike}-OPTION"
 
     @login_required
