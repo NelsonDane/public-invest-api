@@ -674,3 +674,113 @@ class Public:
         if response.status_code != 200:
             raise Exception(f"Cancel order failed: {response.text}")
         return response.json()
+
+    @login_required
+    @refresh_check
+    def fetch_contract_details(self, symbol) -> dict:
+        """
+        Fetches contract details for the given option symbol and ensures all necessary data is gathered.
+        Args:
+            symbol (str): The option symbol to fetch contract details for.
+        Returns:
+            dict: The contract details for the given option symbol.
+        Raises:
+            Exception: If contract details request fails (i.e., response status code is not 200).
+            ValueError: If incomplete contract details are received.
+        """
+        headers = self.endpoints.build_headers(self.access_token)
+        url = self.endpoints.contract_details_url(symbol)
+        response = self.session.get(url, headers=headers, timeout=self.timeout)
+        if response.status_code != 200:
+            raise Exception(f"Error fetching contract details: {response.text}")
+        contract_data = response.json()
+        if not contract_data.get("details", {}).get("quote"):
+            raise ValueError("Incomplete contract details received.")
+        return contract_data
+
+    @staticmethod
+    def _build_option_symbol(stock_symbol, expiration_date, option_type, strike_price):
+        """
+        Builds the option symbol for the given parameters.
+        Args:
+            stock_symbol (str): The stock symbol.
+            expiration_date (str): The expiration date in the format "YYYY-MM-DD".
+            option_type (str): The option type (CALL or PUT).
+            strike_price (float): The strike price of the option.
+        Returns:
+            str: The option symbol for the given parameters.
+        """
+        formatted_strike = f"{int(float(strike_price) * 1000):08d}" # 8 digits padded, in cents
+        formatted_date = datetime.strptime(expiration_date, "%Y-%m-%d").strftime("%y%m%d")
+        return f"{stock_symbol.upper()}{formatted_date}{option_type.upper()}{formatted_strike}-OPTION"
+
+    @login_required
+    @refresh_check
+    def submit_options_order(
+        self,
+        symbol,
+        quantity,
+        limit_price,
+        side="BUY",
+        time_in_force="DAY",
+        is_dry_run=False,
+        tip=None,
+    ) -> dict:
+        """
+        Submits an options order by making a POST request to the build order URL.
+        Args:
+            symbol (str): The stock symbol to place the order for.
+            quantity (float): The quantity of the stock to buy or sell.
+            limit_price (float): The limit price of the order.
+            side (str): The side of the order (BUY or SELL).
+            time_in_force (str): The time in force of the order (DAY, GTC, IOC, or FOK).
+            is_dry_run (bool): Whether to simulate the order without submitting it.
+            tip (float): The tip amount for the order.
+        Returns:
+            dict: The JSON response from the build order URL containing the order details.
+        Raises:
+            Exception: If the order fails (i.e., response status code is not 200).
+        """
+        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
+        symbol = symbol.upper()
+        time_in_force = time_in_force.upper()
+        side = side.upper()
+        if time_in_force not in ["DAY", "GTC", "IOC", "FOK"]:
+            raise Exception(f"Invalid time in force: {time_in_force}")
+        if side not in ["BUY", "SELL"]:
+            raise Exception(f"Invalid side: {side}")
+        # Need to get details first
+        contract_details = self.fetch_contract_details(symbol)
+        if contract_details is None:
+            raise Exception(f"Details not found for {symbol}")
+        payload = {
+            "symbol": symbol,
+            "quantity": quantity,
+            "orderSide": side,
+            "type": "LIMIT",
+            "timeInForce": time_in_force,
+            "limitPrice": limit_price,
+            "quote": contract_details["details"]["quote"],
+            "openCloseIndicator": "OPEN" if side == "BUY" else "CLOSE",
+            "dryRun": is_dry_run,
+            "tip": tip,
+        }
+        # Preflight order endpoint
+        preflight = self.session.post(
+            self.endpoints.preflight_order_url(self.account_uuid),
+            headers=headers,
+            json=payload,
+            timeout=self.timeout,
+        )
+        if preflight.status_code != 200:
+            raise Exception(f"Preflight failed: {preflight.text}")
+        # Place the order
+        response = self.session.post(
+            self.endpoints.build_order_url(self.account_uuid),
+            headers=headers,
+            json=payload,
+            timeout=self.timeout,
+        )
+        if response.status_code != 200:
+            raise Exception(f"Order submission error: {response.text}")
+        return response.json()
