@@ -1,6 +1,8 @@
 __pycache__/
 build/
 .env
-test.py
+test*
 *.egg-info/
 *.json
+.venv
+*.pkl
