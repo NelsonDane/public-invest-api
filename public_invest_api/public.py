@@ -119,9 +119,16 @@ class Public:
         """
         if username is None or password is None:
             raise Exception("Username or password not provided")
+        # See if we can refresh login
+        refresh_success = False
+        try:
+            response = self._refresh_token()
+            refresh_success = True
+        except Exception:
+            pass
         headers = self.session.headers
         need_2fa = True
-        if code is None:
+        if code is None and not refresh_success:
             payload = self.endpoints.build_payload(username, password)
             self._load_cookies()
             response = self.session.post(
@@ -152,7 +159,7 @@ class Public:
                 code = input("Enter code: ")
             else:
                 need_2fa = False
-        if need_2fa:
+        if need_2fa and not refresh_success:
             payload = self.endpoints.build_payload(username, password, code)
             response = self.session.post(
                 self.endpoints.mfa_url(),
@@ -171,17 +178,19 @@ class Public:
             if response.status_code != 200:
                 raise Exception("Login failed, check credentials")
             response = response.json()
-        self.access_token = response["loginResponse"]["accessToken"]
-        self.account_uuid = response["loginResponse"]["accounts"][0]["accountUuid"]
-        self.account_number = response["loginResponse"]["accounts"][0]["account"]
-        self.expires_at = (int(response["loginResponse"]["serverTime"]) / 1000) + int(
-            response["loginResponse"]["expiresIn"]
+        # Get info from response
+        if "loginResponse" in response:
+            response = response["loginResponse"]
+        self.access_token = response["accessToken"]
+        self.account_uuid = response["accounts"][0]["accountUuid"]
+        self.account_number = response["accounts"][0]["account"]
+        self.expires_at = (int(response["serverTime"]) / 1000) + int(
+            response["expiresIn"]
         )
         self.all_login_info = response
         self._save_cookies()
         return response
 
-    @login_required
     def _refresh_token(self) -> dict:
         """
         Refreshes the access token by making a POST request to the refresh URL.
@@ -448,7 +457,7 @@ class Public:
         Returns:
             str: The user's account type.
         """
-        return self.all_login_info["loginResponse"]["accounts"][0]["type"]
+        return self.all_login_info["accounts"][0]["type"]
 
     @login_required
     def get_account_cash(self) -> float:
