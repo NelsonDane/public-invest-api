@@ -51,6 +51,9 @@ class Endpoints:
     def cancel_pending_order_url(self, account_uuid, order_id):
         return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
+    def contract_details_url(self, option_symbol):
+        return f"{self.prodapi}/hstier1service/contract-details/{option_symbol}/BUY"
+
     def build_headers(self, auth=None, prodApi=False):
         headers = {
             "authority": "public.com",
