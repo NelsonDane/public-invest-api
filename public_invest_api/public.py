@@ -5,22 +5,23 @@ from datetime import datetime
 from time import sleep
 
 import requests
+import functools
 
 from public_invest_api.endpoints import Endpoints
 
 
-def login_required(func):
+def _login_required(func):
+    """Decorator to check if user is logged in by checking if access token is None.
+
+    Args:
+        func: The function to wrap.
+    Returns:
+        The wrapped function.
+    Raises:
+        Exception: If the user is not logged in.
+    """
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        """
-        A wrapper function that checks if the user is logged in
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-        Raises:
-            Exception: If the user is not logged in (i.e., access_token is None).
-        Returns:
-            The result of the function `func` if the user is logged in.
-        """
         if self.access_token is None:
             raise Exception("Login required")
         return func(self, *args, **kwargs)
@@ -28,18 +29,16 @@ def login_required(func):
     return wrapper
 
 
-def refresh_check(func):
+def _refresh_check(func):
+    """Decorator to check if the access token is expired and refresh it if necessary.
+
+    Args:
+        func: The function to wrap.
+    Returns:
+        The wrapped function.
+    """
+    @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        """
-        A wrapper function that checks if the access token needs to be refreshed
-        Args:
-            *args: Variable length argument list.
-            **kwargs: Arbitrary keyword arguments.
-        Raises:
-            Exception: If the access token refresh fails (i.e., response status code is not 200).
-        Returns:
-            The result of the function `func` if the access token does not need to be refreshed.
-        """
         if self.expires_at is not None and datetime.now().timestamp() > self.expires_at:
             self._refresh_token()
         return func(self, *args, **kwargs)
@@ -48,7 +47,13 @@ def refresh_check(func):
 
 
 class Public:
-    def __init__(self, filename=None, path=None):
+    """Initializes the Public.com API client.
+
+    Args:
+        filename: The filename to save the cookies to. Defaults to "public_credentials.pkl".
+        path: The path to save the cookies to. Defaults to current directory.
+    """
+    def __init__(self, filename: str = "public_credentials.pkl", path: str = None):
         self.session = requests.Session()
         self.endpoints = Endpoints()
         self.session.headers.update(self.endpoints.build_headers())
@@ -58,12 +63,8 @@ class Public:
         self.all_login_info = None
         self.timeout = 10
         self.expires_at = None
-        self.filename = "public_credentials.pkl"
-        if filename is not None:
-            self.filename = filename
-        self.path = None
-        if path is not None:
-            self.path = path
+        self.filename = filename
+        self.path = path
         self._load_cookies()
 
     def _save_cookies(self) -> None:
@@ -79,8 +80,8 @@ class Public:
             pickle.dump(self.session.cookies, f)
 
     def _load_cookies(self) -> bool:
-        """
-        Load cookies from file
+        """Load cookies from file
+
         Returns:
             bool: True if cookies were loaded, False otherwise
         """
@@ -104,16 +105,16 @@ class Public:
             os.remove(filename)
         self.session.cookies.clear()
 
-    def login(self, username=None, password=None, wait_for_2fa=True, code=None) -> dict:
-        """
-        Logs in to the Public.com API by making a POST request to the login URL.
+    def login(self, username: str = None, password: str = None, wait_for_2fa: str = True, code: str = None) -> dict:
+        """Logs in to the Public.com API by making a POST request to the login URL.
+
         Args:
-            username (str): The email to log in with.
-            password (str): The password to log in with.
-            wait_for_2fa (bool): Whether to wait for 2FA code to be entered or raise exception.
-            code (str): The 2FA code to enter when re-calling login.
+            username: The email to log in with.
+            password: The password to log in with.
+            wait_for_2fa: Whether to wait for 2FA code to be entered or raise exception.
+            code: The 2FA code to enter when re-calling login.
         Returns:
-            dict: The JSON response from the login URL containing the access token.
+            The JSON response from the login URL containing the access token.
         Raises:
             Exception: If the login fails (i.e., response status code is not 200).
         """
@@ -192,10 +193,10 @@ class Public:
         return response
 
     def _refresh_token(self) -> dict:
-        """
-        Refreshes the access token by making a POST request to the refresh URL.
+        """Refreshes the access token by making a POST request to the refresh URL.
+
         Returns:
-            dict: The JSON response from the refresh URL containing the new access token.
+            The JSON response from the refresh URL containing the new access token.
         Raises:
             Exception: If the token refresh fails (i.e., response status code is not 200 or 2FA is required).
         """
@@ -214,13 +215,13 @@ class Public:
         self._save_cookies()
         return response
 
-    @login_required
-    @refresh_check
+    @_login_required
+    @_refresh_check
     def get_portfolio(self) -> dict:
-        """
-        Gets the user's portfolio by making a GET request to the portfolio URL.
+        """Gets the user's portfolio by making a GET request to the portfolio URL.
+
         Returns:
-            dict: The JSON response from the portfolio URL containing the user's portfolio.
+            The JSON response from the portfolio URL containing the user's portfolio.
         Raises:
             Exception: If the portfolio request fails (i.e., response status code is not 200).
         """
@@ -236,12 +237,12 @@ class Public:
 
     @staticmethod
     def _history_filter_date(date: str) -> dict:
-        """
-        Returns the start and end date for the given date range.
+        """Returns the start and end date for the given date range.
+
         Args:
-            date (str): The date range (all, current_month, last_month, this_year, last_year).
+            date The date range (all, current_month, last_month, this_year, last_year).
         Returns:
-            dict: The start and end date for the given date range in the format yyyy-mm-dd.
+            The start and end date for the given date range in the format yyyy-mm-dd.
         """
         if date == "all":
             return {}
@@ -267,34 +268,36 @@ class Public:
             "endDate": end_date.strftime("%Y-%m-%d"),
         }
 
-    @login_required
-    @refresh_check
+    @_login_required
+    @_refresh_check
     def get_account_history(
         self,
-        date="all",
-        asset_class="all",
-        min_amount=None,
-        max_amount=None,
-        transaction_type="all",
-        status="all",
-        nextToken=None,
+        date: str = "all",
+        asset_class: str = "all",
+        min_amount: int = None,
+        max_amount: int = None,
+        transaction_type: str | list = "all",
+        status: str | list = "all",
+        nextToken: str = None,
     ) -> dict:
-        """
-        Returns the user's account history from https://public.com/settings/history.
+        """Returns the user's account history from https://public.com/settings/history.
         The filters match the filters on the website.
+
         Args:
-            date (str, optional): The date range (all, current_month, last_month, this_year, last_year).
-            asset_class (str or list, optional): The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: ["stocks_and_etfs", "options"].
-            min_amount (int, optional): The minimum amount. If both min_amount and max_amount are None, no filter is applied.
-            max_amount (int, optional): The maximum amount. If both min_amount and max_amount are None, no filter is applied.
-            transaction_type (str or list, optional): The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
-            status (str or list, optional): The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: ["completed", "rejected"].
+            date: The date range (all, current_month, last_month, this_year, last_year).
+            asset_class: The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: ["stocks_and_etfs", "options"].
+            min_amount: The minimum amount. If both min_amount and max_amount are None, no filter is applied.
+            max_amount: The maximum amount. If both min_amount and max_amount are None, no filter is applied.
+            transaction_type: The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
+            status: The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: ["completed", "rejected"].
+            nextToken: The next token for pagination.
         Returns:
-            dict: The JSON response from the account history URL containing the user's account history.
+            The JSON response from the account history URL containing the user's account history with keys:
                 - pendingTransactions (list): A list of pending transactions.
                 - transactions (list): A list of transactions.
                 - accountCreated (bool?): Whether the account was created? Not sure, mine is null.
                 - nextToken (str): The next token for pagination.
+
         Raises:
             Exception: If the account history request fails (i.e., response status code is not 200).
         """
@@ -395,35 +398,35 @@ class Public:
             raise Exception(f"Account history request failed: {response.text}")
         return response.json()
 
-    @login_required
+    @_login_required
     def get_account_number(self) -> str:
-        """
-        Gets the user's account number.
+        """Gets the user's account number.
+
         Returns:
-            str: The user's account number.
+            The user's account number.
         """
         return self.account_number
 
-    @login_required
+    @_login_required
     def get_positions(self) -> list:
-        """
-        Gets the user's positions by making a GET request to the positions URL.
+        """Gets the user's positions by making a GET request to the positions URL.
+
         Returns:
-            list: The JSON response from the positions URL containing the user's positions.
+            The JSON response from the positions URL containing the user's positions.
         Raises:
             Exception: If the positions request fails (i.e., response status code is not 200).
         """
         account_info = self.get_portfolio()
         return account_info["positions"]
 
-    @login_required
-    def is_stock_owned(self, symbol) -> bool:
-        """
-        Checks if the user owns a stock by checking the user's positions.
+    @_login_required
+    def is_stock_owned(self, symbol: str) -> bool:
+        """Checks if the user owns a stock by checking the user's positions.
+
         Args:
-            symbol (str): The stock symbol to check.
+            symbol: The stock symbol to check.
         Returns:
-            bool: True if the user owns the stock, False otherwise.
+            True if the user owns the stock, False otherwise.
         """
         positions = self.get_positions()
         for position in positions:
@@ -431,14 +434,14 @@ class Public:
                 return True
         return False
 
-    @login_required
-    def get_owned_stock_quantity(self, symbol) -> float | None:
-        """
-        Gets the quantity of a stock owned by the user.
+    @_login_required
+    def get_owned_stock_quantity(self, symbol: str) -> float | None:
+        """Gets the quantity of a stock owned by the user.
+
         Args:
-            symbol (str): The stock symbol to check.
+            symbol: The stock symbol to check.
         Returns:
-            float: The quantity of the stock owned by the user.
+            The quantity of the stock owned by the user.
         Raises:
             Exception: If the stock is not owned by the user.
         """
@@ -450,34 +453,34 @@ class Public:
                 return float(position["quantity"])
         return None
 
-    @login_required
+    @_login_required
     def get_account_type(self) -> str:
-        """
-        Gets the user's account type.
+        """Gets the user's account type.
+
         Returns:
-            str: The user's account type.
+            The user's account type.
         """
         return self.all_login_info["accounts"][0]["type"]
 
-    @login_required
+    @_login_required
     def get_account_cash(self) -> float:
-        """
-        Gets the user's account cash balance.
+        """Gets the user's account cash balance.
+
         Returns:
-            float: The user's account cash balance.
+            The user's account cash balance.
         """
         account_info = self.get_portfolio()
         return account_info["equity"]["cash"]
 
-    @login_required
-    @refresh_check
-    def get_symbol_price(self, symbol) -> float:
-        """
-        Gets the price of a stock by making a GET request to the quote URL.
+    @_login_required
+    @_refresh_check
+    def get_symbol_price(self, symbol: str) -> float:
+        """Gets the price of a stock by making a GET request to the quote URL.
+
         Args:
-            symbol (str): The stock symbol to get the price of.
+            symbol: The stock symbol to get the price of.
         Returns:
-            float: The price of the stock.
+            The price of the stock.
         Raises:
             Exception: If the quote request fails (i.e., response status code is not 200).
         """
@@ -492,21 +495,21 @@ class Public:
             return response.json()["quotes"][0]["last"]
         return response.json()["price"]
 
-    @login_required
-    @refresh_check
-    def get_order_quote(self, symbol) -> dict:
-        """
-        Gets a quote for an order by making a GET request to the order quote URL.
+    @_login_required
+    @_refresh_check
+    def get_order_quote(self, symbol: str) -> dict:
+        """Gets a quote for an order by making a GET request to the order quote URL.
+
         Args:
-            symbol (str): The stock symbol to get the order quote for.
+            symbol: The stock symbol to get the order quote for.
         Returns:
-            dict: The JSON response from the order quote URL containing the order quote.
+            The JSON response from the order quote URL containing the order quote.
         Raises:
             Exception: If the quote request fails (i.e., response status code is not 200).
         """
         headers = self.endpoints.build_headers(self.access_token)
         response = self.session.get(
-            self.endpoints.get_order_quote(symbol),
+            self.endpoints.get_quote_url(symbol),
             headers=headers,
             timeout=self.timeout,
         )
@@ -514,32 +517,32 @@ class Public:
             raise Exception(f"Quote request failed: {response.text}")
         return response.json()
 
-    @login_required
-    @refresh_check
+    @_login_required
+    @_refresh_check
     def place_order(
         self,
-        symbol,
-        quantity,
-        side,
-        order_type,
-        time_in_force,
-        limit_price=None,
-        is_dry_run=False,
-        tip=None,
+        symbol: str,
+        quantity: float,
+        side: str,
+        order_type: str,
+        time_in_force: str,
+        limit_price: float = None,
+        is_dry_run: bool = False,
+        tip: float = None,
     ) -> dict:
-        """
-        Places an order by making a POST request to the build order URL.
+        """Places an order by making a POST request to the build order URL.
+
         Args:
-            symbol (str): The stock symbol to place the order for.
-            quantity (float): The quantity of the stock to buy or sell, or "all" to sell all owned stock.
-            side (str): The side of the order (BUY or SELL).
-            order_type (str): The type of the order (MARKET, LIMIT, or STOP).
-            time_in_force (str): The time in force of the order (DAY, GTC, IOC, or FOK).
-            limit_price (float): The limit price of the order (required for limit orders).
-            is_dry_run (bool): Whether to simulate the order without submitting it.
-            tip (float): The tip amount for the order.
+            symbol: The stock symbol to place the order for.
+            quantity: The quantity of the stock to buy or sell, or "all" to sell all owned stock.
+            side: The side of the order (BUY or SELL).
+            order_type: The type of the order (MARKET, LIMIT, or STOP).
+            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).
+            limit_price: The limit price of the order (required for limit orders).
+            is_dry_run: Whether to simulate the order without submitting it.
+            tip: The tip amount for the order.
         Returns:
-            dict: The JSON response from the build order URL containing the order details.
+            The JSON response from the build order URL containing the order details.
         Raises:
             Exception: If the order fails (i.e., response status code is not 200).
         """
@@ -635,13 +638,13 @@ class Public:
             check_response["success"] = True
         return check_response
 
-    @login_required
-    @refresh_check
+    @_login_required
+    @_refresh_check
     def get_pending_orders(self) -> dict:
-        """
-        Gets the user's pending orders by making a GET request to the pending orders URL.
+        """Gets the user's pending orders by making a GET request to the pending orders URL.
+
         Returns:
-            dict: The JSON response from the pending orders URL containing the user's pending orders.
+            The JSON response from the pending orders URL containing the user's pending orders.
         Raises:
             Exception: If the pending orders request fails (i.e., response status code is not 200).
         """
@@ -655,15 +658,15 @@ class Public:
             raise Exception(f"Pending orders request failed: {response.text}")
         return response.json()
 
-    @login_required
-    @refresh_check
-    def cancel_order(self, order_id) -> dict:
-        """
-        Cancels an order by making a DELETE request to the cancel order URL.
+    @_login_required
+    @_refresh_check
+    def cancel_order(self, order_id: str) -> dict:
+        """Cancels an order by making a DELETE request to the cancel order URL.
+
         Args:
-            order_id (str): The order ID to cancel.
+            order_id: The order ID to cancel.
         Returns:
-            dict: The JSON response from the cancel order URL containing the order details.
+            The JSON response from the cancel order URL containing the order details.
         Raises:
             Exception: If the cancel order fails (i.e., response status code is not 200).
         """
