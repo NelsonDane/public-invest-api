@@ -20,8 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Build and Publish
-        uses: lsst-sqre/build-and-publish-to-pypi@v2
+        uses: lsst-sqre/build-and-publish-to-pypi@v3
         with:
-          python-version: "3.11"
           upload: ${{ github.ref == 'refs/heads/main' }}
         
