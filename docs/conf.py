@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../../public_invest_api"))
+sys.path.insert(0, os.path.abspath("../public_invest_api"))
 
 # Configuration file for the Sphinx documentation builder.
 #
