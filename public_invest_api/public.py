@@ -1,11 +1,11 @@
 import calendar
+import functools
 import os
 import pickle
 from datetime import datetime
 from time import sleep
 
 import requests
-import functools
 
 from public_invest_api.endpoints import Endpoints
 
@@ -20,6 +20,7 @@ def _login_required(func):
     Raises:
         Exception: If the user is not logged in.
     """
+
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         if self.access_token is None:
@@ -37,6 +38,7 @@ def _refresh_check(func):
     Returns:
         The wrapped function.
     """
+
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
         if self.expires_at is not None and datetime.now().timestamp() > self.expires_at:
@@ -53,6 +55,7 @@ class Public:
         filename: The filename to save the cookies to. Defaults to "public_credentials.pkl".
         path: The path to save the cookies to. Defaults to current directory.
     """
+
     def __init__(self, filename: str = "public_credentials.pkl", path: str = None):
         self.session = requests.Session()
         self.endpoints = Endpoints()
@@ -105,7 +108,13 @@ class Public:
             os.remove(filename)
         self.session.cookies.clear()
 
-    def login(self, username: str = None, password: str = None, wait_for_2fa: str = True, code: str = None) -> dict:
+    def login(
+        self,
+        username: str = None,
+        password: str = None,
+        wait_for_2fa: str = True,
+        code: str = None,
+    ) -> dict:
         """Logs in to the Public.com API by making a POST request to the login URL.
 
         Args:
