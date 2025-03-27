@@ -1,8 +1,11 @@
+_build/
 __pycache__/
-build/
-.env
-test*
-*.egg-info/
-*.json
 .venv
+.env
+*egg-info/
+*.json
+modules.rst
 *.pkl
+_static/
+_templates/
+test*
