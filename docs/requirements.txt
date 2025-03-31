@@ -1,0 +1,4 @@
+furo==2024.8.6
+sphinx==8.2.3
+sphinx-new-tab-link==0.7.0
+../public-invest-api
