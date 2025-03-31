@@ -60,7 +60,7 @@ class Endpoints:
         Returns:
             The stock quote endpoint URL.
         """
-        return f"{self.prodapi}/marketdataservice/stockcharts/last-trade/{symbol}"
+        return f"{self.prodapi}/tradingservice/quote/equity/{symbol}"
 
     def get_crypto_quote_url(self, symbol: str) -> str:
         """Constructs the URL for fetching a cryptocurrency quote.
@@ -71,6 +71,69 @@ class Endpoints:
             The crypto quote endpoint URL.
         """
         return f"{self.prodapi}/cryptoservice/quotes?symbols={symbol}"
+
+    def preflight_order_url(self, account_uuid: str) -> str:
+        """Constructs the URL for preflight order validation.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+        Returns:
+            The preflight order endpoint URL.
+        """
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/preflight"
+
+    def build_order_url(self, account_uuid: str) -> str:
+        """Constructs the URL for building an order.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+        Returns:
+            The build order endpoint URL.
+        """
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders"
+
+    def submit_put_order_url(self, account_uuid, order_id):
+        """Constructs the URL for submitting a PUT order.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+            order_id: The unique identifier for the order.
+        Returns:
+            The submit PUT order endpoint URL.
+        """
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
+
+    def submit_get_order_url(self, account_uuid, order_id):
+        """Constructs the URL for submitting a GET order.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+            order_id: The unique identifier for the order.
+        Returns:
+            The submit GET order endpoint URL.
+        """
+        return f"{self.prodapi}/hstier1service/account/{account_uuid}/order/{order_id}"
+
+    def get_pending_orders_url(self, account_uuid):
+        """Constructs the URL for fetching pending orders.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+        Returns:
+            The pending orders endpoint URL.
+        """
+        return f"{self.prodapi}/hstier2service/history?&&status=PENDING&type=ALL&accountUuids={account_uuid}"
+
+    def cancel_pending_order_url(self, account_uuid, order_id):
+        """Constructs the URL for canceling a pending order.
+
+        Args:
+            account_uuid: The unique identifier for the account.
+            order_id: The unique identifier for the order.
+        Returns:
+            The cancel pending order endpoint URL.
+        """
+        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
     def build_headers(self, auth: bool = None, prodApi: bool = False) -> dict:
         """Builds HTTP headers for API requests.
