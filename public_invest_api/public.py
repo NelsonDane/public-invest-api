@@ -696,13 +696,14 @@ class Public:
             raise Exception(f"Cancel order failed: {response.text}")
         return response.json()
 
-    @login_required
-    @refresh_check
-    def fetch_contract_details(self, symbol) -> dict:
+    @_login_required
+    @_refresh_check
+    def fetch_contract_details(self, symbol: str) -> dict:
         """
         Fetches contract details for the given option symbol and ensures all necessary data is gathered.
+
         Args:
-            symbol (str): The option symbol to fetch contract details for.
+            symbol: The option symbol to fetch contract details for.
         Returns:
             dict: The contract details for the given option symbol.
         Raises:
@@ -720,16 +721,17 @@ class Public:
         return contract_data
 
     @staticmethod
-    def _build_option_symbol(stock_symbol, expiration_date, option_type, strike_price):
+    def _build_option_symbol(stock_symbol: str, expiration_date: str, option_type: str, strike_price: float) -> str:
         """
         Builds the option symbol for the given parameters.
+
         Args:
-            stock_symbol (str): The stock symbol.
-            expiration_date (str): The expiration date in the format "YYYY-MM-DD".
-            option_type (str): The option type (CALL or PUT).
-            strike_price (float): The strike price of the option.
+            stock_symbol: The stock symbol.
+            expiration_date: The expiration date in the format "YYYY-MM-DD".
+            option_type: The option type (CALL or PUT).
+            strike_price: The strike price of the option.
         Returns:
-            str: The option symbol for the given parameters.
+            The option symbol for the given parameters.
         """
         formatted_strike = (
             f"{int(float(strike_price) * 1000):08d}"  # 8 digits padded, in cents
@@ -739,30 +741,31 @@ class Public:
         )
         return f"{stock_symbol.upper()}{formatted_date}{option_type.upper()}{formatted_strike}-OPTION"
 
-    @login_required
-    @refresh_check
+    @_login_required
+    @_refresh_check
     def submit_options_order(
         self,
-        symbol,
-        quantity,
-        limit_price,
-        side="BUY",
-        time_in_force="DAY",
-        is_dry_run=False,
-        tip=None,
+        symbol: str,
+        quantity: float,
+        limit_price: float,
+        side: str = "BUY",
+        time_in_force: str = "DAY",
+        is_dry_run: bool = False,
+        tip: float | None = None,
     ) -> dict:
         """
         Submits an options order by making a POST request to the build order URL.
+
         Args:
-            symbol (str): The stock symbol to place the order for.
-            quantity (float): The quantity of the stock to buy or sell.
-            limit_price (float): The limit price of the order.
-            side (str): The side of the order (BUY or SELL).
-            time_in_force (str): The time in force of the order (DAY, GTC, IOC, or FOK).
-            is_dry_run (bool): Whether to simulate the order without submitting it.
-            tip (float): The tip amount for the order.
+            symbol: The stock symbol to place the order for.
+            quantity: The quantity of the stock to buy or sell.
+            limit_price: The limit price of the order.
+            side The side of the order (BUY or SELL).
+            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).
+            is_dry_run: Whether to simulate the order without submitting it.
+            tip: The tip amount for the order.
         Returns:
-            dict: The JSON response from the build order URL containing the order details.
+            The JSON response from the build order URL containing the order details.
         Raises:
             Exception: If the order fails (i.e., response status code is not 200).
         """
