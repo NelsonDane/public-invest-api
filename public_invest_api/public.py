@@ -699,15 +699,14 @@ class Public:
     @_login_required
     @_refresh_check
     def fetch_contract_details(self, symbol: str) -> dict:
-        """
-        Fetches contract details for the given option symbol and ensures all necessary data is gathered.
+        """Fetches contract details for the given option symbol 
 
         Args:
             symbol: The option symbol to fetch contract details for.
         Returns:
             dict: The contract details for the given option symbol.
         Raises:
-            Exception: If contract details request fails (i.e., response status code is not 200).
+            Exception: If request fails (i.e., response status code is not 200).
             ValueError: If incomplete contract details are received.
         """
         headers = self.endpoints.build_headers(self.access_token)
@@ -724,8 +723,7 @@ class Public:
     def _build_option_symbol(
         stock_symbol: str, expiration_date: str, option_type: str, strike_price: float
     ) -> str:
-        """
-        Builds the option symbol for the given parameters.
+        """Builds the option symbol for the given parameters.
 
         Args:
             stock_symbol: The stock symbol.
@@ -755,8 +753,7 @@ class Public:
         is_dry_run: bool = False,
         tip: float | None = None,
     ) -> dict:
-        """
-        Submits an options order by making a POST request to the build order URL.
+        """Submits an options order by making a POST request to the build order URL.
 
         Args:
             symbol: The stock symbol to place the order for.
