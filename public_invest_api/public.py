@@ -699,7 +699,7 @@ class Public:
     @_login_required
     @_refresh_check
     def fetch_contract_details(self, symbol: str) -> dict:
-        """Fetches contract details for the given option symbol 
+        """Fetches contract details for the given option symbol
 
         Args:
             symbol: The option symbol to fetch contract details for.
