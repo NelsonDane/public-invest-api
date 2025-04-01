@@ -92,7 +92,7 @@ class Endpoints:
         """
         return f"{self.ordergateway}/accounts/{account_uuid}/orders"
 
-    def submit_put_order_url(self, account_uuid, order_id):
+    def submit_put_order_url(self, account_uuid: str, order_id: str) -> str:
         """Constructs the URL for submitting a PUT order.
 
         Args:
@@ -103,7 +103,7 @@ class Endpoints:
         """
         return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
-    def submit_get_order_url(self, account_uuid, order_id):
+    def submit_get_order_url(self, account_uuid: str, order_id: str) -> str:
         """Constructs the URL for submitting a GET order.
 
         Args:
@@ -114,7 +114,7 @@ class Endpoints:
         """
         return f"{self.prodapi}/hstier1service/account/{account_uuid}/order/{order_id}"
 
-    def get_pending_orders_url(self, account_uuid):
+    def get_pending_orders_url(self, account_uuid: str) -> str:
         """Constructs the URL for fetching pending orders.
 
         Args:
@@ -124,7 +124,7 @@ class Endpoints:
         """
         return f"{self.prodapi}/hstier2service/history?&&status=PENDING&type=ALL&accountUuids={account_uuid}"
 
-    def cancel_pending_order_url(self, account_uuid, order_id):
+    def cancel_pending_order_url(self, account_uuid: str, order_id: str) -> str:
         """Constructs the URL for canceling a pending order.
 
         Args:
@@ -135,7 +135,14 @@ class Endpoints:
         """
         return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
-    def contract_details_url(self, option_symbol):
+    def contract_details_url(self, option_symbol: str) -> str:
+        """Constructs the URL for fetching contract details.
+
+        Args:
+            option_symbol: The symbol of the option.
+        Returns:
+            The contract details endpoint URL.
+        """
         return f"{self.prodapi}/hstier1service/contract-details/{option_symbol}/BUY"
 
     def build_headers(self, auth: bool = None, prodApi: bool = False) -> dict:
