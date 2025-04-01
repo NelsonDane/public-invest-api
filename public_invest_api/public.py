@@ -721,7 +721,9 @@ class Public:
         return contract_data
 
     @staticmethod
-    def _build_option_symbol(stock_symbol: str, expiration_date: str, option_type: str, strike_price: float) -> str:
+    def _build_option_symbol(
+        stock_symbol: str, expiration_date: str, option_type: str, strike_price: float
+    ) -> str:
         """
         Builds the option symbol for the given parameters.
 
