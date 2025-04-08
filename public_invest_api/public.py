@@ -273,8 +273,8 @@ class Public:
             start_date = datetime(now.year - 1, 1, 1)
             end_date = datetime(now.year - 1, 12, 31)
         return {
-            "startDate": start_date.strftime("%Y-%m-%d"),
-            "endDate": end_date.strftime("%Y-%m-%d"),
+            "dateFrom": start_date.strftime("%Y-%m-%d"),
+            "dateTo": end_date.strftime("%Y-%m-%d"),
         }
 
     @_login_required
@@ -316,6 +316,7 @@ class Public:
         # Verifications
         if date not in ["all", "current_month", "last_month", "this_year", "last_year"]:
             raise Exception(f"Invalid date: {date}")
+        
         if asset_class != "all":
             if not isinstance(asset_class, list):
                 asset_class = [asset_class]
@@ -358,6 +359,7 @@ class Public:
             for s in status:
                 if s not in ["all", "completed", "rejected", "cancelled", "pending"]:
                     raise Exception(f"Invalid status: {s}")
+                
         # Date filter
         date_params = self._history_filter_date(date)
         if date_params != {}:
@@ -398,7 +400,7 @@ class Public:
             params["status"] = [s.upper() for s in status]
         # Next token
         if nextToken is not None:
-            params["nextToken"] = nextToken
+            params["nextToken"] = nextToken            
         # Make the request
         response = self.session.get(
             url, headers=headers, params=params, timeout=self.timeout
