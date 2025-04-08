@@ -14,12 +14,16 @@ Then see the [examples](https://docs.nelsondane.me/public-invest-api/examples.ht
 
 ## Credentials Protections
 
-Do the following in your terminal:
+To protect your Public.com credentials from accidental secret exposure, do the following in your terminal:
 
 ```bash
 export PUBLIC_USERNAME='<email associated with your Public account>'
 export PUBLIC_PSWD='<password associated with your Public account>'
 ```
+
+For an example on how to use the above environment variables, check the following file:
+
+[get_public_com_data.py](get_public_com_data.py)
 
 ## Documentation
 Check out the new documentation site at [https://docs.nelsondane.me/public-invest-api/](https://docs.nelsondane.me/public-invest-api/)! It has a full API reference, examples, and more.
