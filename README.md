@@ -12,6 +12,15 @@ pip install public-invest-api
 
 Then see the [examples](https://docs.nelsondane.me/public-invest-api/examples.html) for how to use the API.
 
+## Credentials Protections
+
+Do the following in your terminal:
+
+```bash
+export PUBLIC_USERNAME='<email associated with your Public account>'
+export PUBLIC_PSWD='<password associated with your Public account>'
+```
+
 ## Documentation
 Check out the new documentation site at [https://docs.nelsondane.me/public-invest-api/](https://docs.nelsondane.me/public-invest-api/)! It has a full API reference, examples, and more.
 
