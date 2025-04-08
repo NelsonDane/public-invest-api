@@ -314,25 +314,8 @@ class Public:
         url = self.endpoints.account_history_url(self.account_uuid)
         params = {}
         # Verifications
-        
-        # if date not in ["all", "month", "last_month", "year", "last_year"]:
-        #     raise Exception(f"Invalid date: {date}")
-        
         if date not in ["all", "current_month", "last_month", "this_year", "last_year"]:
             raise Exception(f"Invalid date: {date}")
-        
-        # if date != "all":
-        #     if not isinstance(date, list):
-        #         date = [date]
-        #     for d in date:
-        #         if d not in [
-        #             "all",
-        #             "month",
-        #             "last_month",
-        #             "year",
-        #             "last_year",
-        #         ]:
-        #             raise Exception(f"Invalid date: {date}")
         
         if asset_class != "all":
             if not isinstance(asset_class, list):
@@ -381,26 +364,6 @@ class Public:
         date_params = self._history_filter_date(date)
         if date_params != {}:
             params.update(date_params)
-        
-        # date_map = {
-        #         "all": "All time",
-        #         "month": "Current month",
-        #         "last_month": "Last month",
-        #         "year": "This year",
-        #         "last_year": "Last year",
-                
-        #         }
-        # params["dateRange"] = date
-        
-        #  # Next token
-        # if date is not None:
-        #     params["date"] = date
-            
-        # # Date filter
-        # if date != "all":
-        #     # params["date"] = [d.upper() for d in date]
-        #     params["date"] = [d for d in date]
-            
         # Asset class filter
         if asset_class != "all":
             asset_class_map = {
@@ -437,10 +400,7 @@ class Public:
             params["status"] = [s.upper() for s in status]
         # Next token
         if nextToken is not None:
-            params["nextToken"] = nextToken
-            
-        # print(f"Params: {params}")
-            
+            params["nextToken"] = nextToken            
         # Make the request
         response = self.session.get(
             url, headers=headers, params=params, timeout=self.timeout
