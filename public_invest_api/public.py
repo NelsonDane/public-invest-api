@@ -316,7 +316,6 @@ class Public:
         # Verifications
         if date not in ["all", "current_month", "last_month", "this_year", "last_year"]:
             raise Exception(f"Invalid date: {date}")
-        
         if asset_class != "all":
             if not isinstance(asset_class, list):
                 asset_class = [asset_class]
