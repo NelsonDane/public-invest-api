@@ -359,7 +359,6 @@ class Public:
             for s in status:
                 if s not in ["all", "completed", "rejected", "cancelled", "pending"]:
                     raise Exception(f"Invalid status: {s}")
-                
         # Date filter
         date_params = self._history_filter_date(date)
         if date_params != {}:
@@ -400,7 +399,7 @@ class Public:
             params["status"] = [s.upper() for s in status]
         # Next token
         if nextToken is not None:
-            params["nextToken"] = nextToken            
+            params["nextToken"] = nextToken
         # Make the request
         response = self.session.get(
             url, headers=headers, params=params, timeout=self.timeout
