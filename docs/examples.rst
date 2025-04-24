@@ -18,6 +18,27 @@ Logging In
 
 This will ask for the 2FA code sent to your phone via sms. It wil display an `input()` promopt in the terminal.
 
+If you'd like to log in using environment variables (for added account credentials protection), you can set the following environment variables (this is done on Mac with zsh-based terminal):
+
+.. code-block:: bash
+
+    export PUBLIC_USERNAME='<email associated with your Public account>'
+    export PUBLIC_PSWD='<password associated with your Public account>'
+
+Then you can log in without passing any arguments:
+
+.. code-block:: python
+
+    from public_invest_api import Public
+    import os
+
+    public = Public()
+    public.login(
+        username=os.getenv('PUBLIC_USERNAME'),
+        password=os.getenv('PUBLIC_PSWD'),
+        wait_for_2fa=True
+    )
+
 If you'd like to handle the 2FA code yourself programmatically, set `wait_for_2fa=False` and the function will throw an Exception relating to 2FA. 
 Catch this, then when you get the 2FA code, call it again with these arguments:
 
