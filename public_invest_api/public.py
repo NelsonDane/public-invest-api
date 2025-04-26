@@ -273,8 +273,8 @@ class Public:
             start_date = datetime(now.year - 1, 1, 1)
             end_date = datetime(now.year - 1, 12, 31)
         return {
-            "startDate": start_date.strftime("%Y-%m-%d"),
-            "endDate": end_date.strftime("%Y-%m-%d"),
+            "dateFrom": start_date.strftime("%Y-%m-%d"),
+            "dateTo": end_date.strftime("%Y-%m-%d"),
         }
 
     @_login_required
