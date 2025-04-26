@@ -1,0 +1,1172 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>public_invest_api.public - Public Invest API Docs</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">Public Invest API Docs</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">Public Invest API Docs</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../public_invest_api.html">Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_functions.html">Developer Functions</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/NelsonDane/public-invest-api" rel="noreferrer" target="_blank">📈 GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://blog.nelsondane.me/" rel="noreferrer" target="_blank">🐌 NelsonDane</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <h1>Source code for public_invest_api.public</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">calendar</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="kn">from</span> <span class="nn">public_invest_api.endpoints</span> <span class="kn">import</span> <span class="n">Endpoints</span>
+
+
+<div class="viewcode-block" id="_login_required">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public._login_required">[docs]</a>
+<span class="k">def</span> <span class="nf">_login_required</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to check if user is logged in by checking if access token is None.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        func: The function to wrap.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The wrapped function.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: If the user is not logged in.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Login required&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="_refresh_check">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public._refresh_check">[docs]</a>
+<span class="k">def</span> <span class="nf">_refresh_check</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to check if the access token is expired and refresh it if necessary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        func: The function to wrap.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        The wrapped function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_refresh_token</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+
+<div class="viewcode-block" id="Public">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public">[docs]</a>
+<span class="k">class</span> <span class="nc">Public</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initializes the Public.com API client.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        filename: The filename to save the cookies to. Defaults to &quot;public_credentials.pkl&quot;.</span>
+<span class="sd">        path: The path to save the cookies to. Defaults to current directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;public_credentials.pkl&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span> <span class="o">=</span> <span class="n">Endpoints</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account_number</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_login_info</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_cookies</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Public._save_cookies">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._save_cookies">[docs]</a>
+    <span class="k">def</span> <span class="nf">_save_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save cookies to file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">cookies</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Public._load_cookies">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._load_cookies">[docs]</a>
+    <span class="k">def</span> <span class="nf">_load_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load cookies from file</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if cookies were loaded, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">))</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="Public._clear_cookies">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._clear_cookies">[docs]</a>
+    <span class="k">def</span> <span class="nf">_clear_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear cookies and remove file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">cookies</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public.login">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.login">[docs]</a>
+    <span class="k">def</span> <span class="nf">login</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">wait_for_2fa</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs in to the Public.com API by making a POST request to the login URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The email to log in with.</span>
+<span class="sd">            password: The password to log in with.</span>
+<span class="sd">            wait_for_2fa: Whether to wait for 2FA code to be entered or raise exception.</span>
+<span class="sd">            code: The 2FA code to enter when re-calling login.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the login URL containing the access token.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the login fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">password</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Username or password not provided&quot;</span><span class="p">)</span>
+        <span class="c1"># See if we can refresh login</span>
+        <span class="n">refresh_success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_refresh_token</span><span class="p">()</span>
+            <span class="n">refresh_success</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span>
+        <span class="n">need_2fa</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">code</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh_success</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_payload</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load_cookies</span><span class="p">()</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">login_url</span><span class="p">(),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="c1"># Perhaps cookies are expired</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cookies</span><span class="p">()</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">login_url</span><span class="p">(),</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Login failed, check credentials&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;twoFactorResponse&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clear_cookies</span><span class="p">()</span>
+                <span class="n">phone</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;twoFactorResponse&quot;</span><span class="p">][</span><span class="s2">&quot;maskedPhoneNumber&quot;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;2FA required, code sent to phone number </span><span class="si">{</span><span class="n">phone</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">wait_for_2fa</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;2FA required: please provide code&quot;</span><span class="p">)</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="s2">&quot;Enter code: &quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">need_2fa</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">need_2fa</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">refresh_success</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_payload</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">code</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">mfa_url</span><span class="p">(),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;MFA Login failed, check credentials and code&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">login_url</span><span class="p">(),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Login failed, check credentials&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="c1"># Get info from response</span>
+        <span class="k">if</span> <span class="s2">&quot;loginResponse&quot;</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;loginResponse&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;accessToken&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;accounts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;accountUuid&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account_number</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;accounts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;account&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;serverTime&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">response</span><span class="p">[</span><span class="s2">&quot;expiresIn&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">all_login_info</span> <span class="o">=</span> <span class="n">response</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_cookies</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="Public._refresh_token">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._refresh_token">[docs]</a>
+    <span class="k">def</span> <span class="nf">_refresh_token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Refreshes the access token by making a POST request to the refresh URL.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the refresh URL containing the new access token.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the token refresh fails (i.e., response status code is not 200 or 2FA is required).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">refresh_url</span><span class="p">(),</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Token refresh failed&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;accessToken&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;serverTime&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="n">response</span><span class="p">[</span><span class="s2">&quot;expiresIn&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span> <span class="o">=</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;accounts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;accountUuid&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_save_cookies</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="Public.get_portfolio">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_portfolio">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">get_portfolio</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s portfolio by making a GET request to the portfolio URL.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the portfolio URL containing the user&#39;s portfolio.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the portfolio request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span> <span class="n">prodApi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">portfolio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">portfolio_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Portfolio request failed: </span><span class="si">{</span><span class="n">portfolio</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">portfolio</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public._history_filter_date">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._history_filter_date">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_history_filter_date</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the start and end date for the given date range.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            date The date range (all, current_month, last_month, this_year, last_year).</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The start and end date for the given date range in the format yyyy-mm-dd.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;current_month&quot;</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span>
+                <span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">calendar</span><span class="o">.</span><span class="n">monthrange</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;last_month&quot;</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span>
+                <span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">calendar</span><span class="o">.</span><span class="n">monthrange</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">now</span><span class="o">.</span><span class="n">month</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;this_year&quot;</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">date</span> <span class="o">==</span> <span class="s2">&quot;last_year&quot;</span><span class="p">:</span>
+            <span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="n">now</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;dateFrom&quot;</span><span class="p">:</span> <span class="n">start_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;dateTo&quot;</span><span class="p">:</span> <span class="n">end_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Public.get_account_history">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_account_history">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">get_account_history</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">asset_class</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">min_amount</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_amount</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">transaction_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+        <span class="n">nextToken</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the user&#39;s account history from https://public.com/settings/history.</span>
+<span class="sd">        The filters match the filters on the website.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            date: The date range (all, current_month, last_month, this_year, last_year).</span>
+<span class="sd">            asset_class: The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: [&quot;stocks_and_etfs&quot;, &quot;options&quot;].</span>
+<span class="sd">            min_amount: The minimum amount. If both min_amount and max_amount are None, no filter is applied.</span>
+<span class="sd">            max_amount: The maximum amount. If both min_amount and max_amount are None, no filter is applied.</span>
+<span class="sd">            transaction_type: The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: [&quot;buy&quot;, &quot;sell&quot;].</span>
+<span class="sd">            status: The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: [&quot;completed&quot;, &quot;rejected&quot;].</span>
+<span class="sd">            nextToken: The next token for pagination.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the account history URL containing the user&#39;s account history with keys:</span>
+<span class="sd">                - pendingTransactions (list): A list of pending transactions.</span>
+<span class="sd">                - transactions (list): A list of transactions.</span>
+<span class="sd">                - accountCreated (bool?): Whether the account was created? Not sure, mine is null.</span>
+<span class="sd">                - nextToken (str): The next token for pagination.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the account history request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">account_history_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Verifications</span>
+        <span class="k">if</span> <span class="n">date</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;current_month&quot;</span><span class="p">,</span> <span class="s2">&quot;last_month&quot;</span><span class="p">,</span> <span class="s2">&quot;this_year&quot;</span><span class="p">,</span> <span class="s2">&quot;last_year&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid date: </span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">asset_class</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">asset_class</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">asset_class</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset_class</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">asset_class</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">asset</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;stocks_and_etfs&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;options&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;bonds&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;crypto&quot;</span><span class="p">,</span>
+                <span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid asset class: </span><span class="si">{</span><span class="n">asset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">min_amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">min_amount</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid min amount. Must be int.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">max_amount</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Invalid max amount. Must be int.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">transaction_type</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transaction_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">transaction_type</span> <span class="o">=</span> <span class="p">[</span><span class="n">transaction_type</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">transaction_type</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;buy&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;sell&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;multi_leg&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;deposit&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;withdrawal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;6m_treasury_bills&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;acat&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;option_event&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;interest_dividend_maturity&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;reward&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;subscription&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;misc&quot;</span><span class="p">,</span>
+                <span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid type: </span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="p">[</span><span class="n">status</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">status</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;completed&quot;</span><span class="p">,</span> <span class="s2">&quot;rejected&quot;</span><span class="p">,</span> <span class="s2">&quot;cancelled&quot;</span><span class="p">,</span> <span class="s2">&quot;pending&quot;</span><span class="p">]:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid status: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Date filter</span>
+        <span class="n">date_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_history_filter_date</span><span class="p">(</span><span class="n">date</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date_params</span> <span class="o">!=</span> <span class="p">{}:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">date_params</span><span class="p">)</span>
+        <span class="c1"># Asset class filter</span>
+        <span class="k">if</span> <span class="n">asset_class</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">asset_class_map</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;stocks_and_etfs&quot;</span><span class="p">:</span> <span class="s2">&quot;EQUITY&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;options&quot;</span><span class="p">:</span> <span class="s2">&quot;OPTION&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;bonds&quot;</span><span class="p">:</span> <span class="s2">&quot;BOND&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crypto&quot;</span><span class="p">:</span> <span class="s2">&quot;CRYPTO&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;assetClass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">asset_class_map</span><span class="p">[</span><span class="n">asset</span><span class="p">]</span> <span class="k">for</span> <span class="n">asset</span> <span class="ow">in</span> <span class="n">asset_class</span><span class="p">]</span>
+        <span class="c1"># Amount filter</span>
+        <span class="k">if</span> <span class="n">min_amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;amountGreaterThanEqualTo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_amount</span>
+        <span class="k">if</span> <span class="n">max_amount</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;amountLessThanEqualTo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_amount</span>
+        <span class="c1"># Type filter</span>
+        <span class="k">if</span> <span class="n">transaction_type</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">type_map</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;buy&quot;</span><span class="p">:</span> <span class="s2">&quot;PURCHASE&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sell&quot;</span><span class="p">:</span> <span class="s2">&quot;SALE&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;multi_leg&quot;</span><span class="p">:</span> <span class="s2">&quot;MULTI_LEG_ORDER&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;deposit&quot;</span><span class="p">:</span> <span class="s2">&quot;DEPOSIT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;withdrawal&quot;</span><span class="p">:</span> <span class="s2">&quot;WITHDRAWAL&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;6m_treasury_bills&quot;</span><span class="p">:</span> <span class="s2">&quot;TREASURY_ACCOUNT_TRANSFER&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;acat&quot;</span><span class="p">:</span> <span class="s2">&quot;ACAT&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;option_event&quot;</span><span class="p">:</span> <span class="s2">&quot;OPTION_EVENTS&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;interest_dividend_maturity&quot;</span><span class="p">:</span> <span class="s2">&quot;INTEREST&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reward&quot;</span><span class="p">:</span> <span class="s2">&quot;STOCK_REWARD&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;subscription&quot;</span><span class="p">:</span> <span class="s2">&quot;SUBSCRIPTION&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;misc&quot;</span><span class="p">:</span> <span class="s2">&quot;OTHER&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">type_map</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">transaction_type</span><span class="p">]</span>
+        <span class="c1"># Status filter</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">status</span><span class="p">]</span>
+        <span class="c1"># Next token</span>
+        <span class="k">if</span> <span class="n">nextToken</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;nextToken&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nextToken</span>
+        <span class="c1"># Make the request</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Account history request failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public.get_account_number">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_account_number">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">get_account_number</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s account number.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The user&#39;s account number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">account_number</span></div>
+
+
+<div class="viewcode-block" id="Public.get_positions">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_positions">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">get_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s positions by making a GET request to the positions URL.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the positions URL containing the user&#39;s positions.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the positions request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">account_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_portfolio</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">account_info</span><span class="p">[</span><span class="s2">&quot;positions&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Public.is_stock_owned">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.is_stock_owned">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">is_stock_owned</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the user owns a stock by checking the user&#39;s positions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to check.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            True if the user owns the stock, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">position</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;symbol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">symbol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="Public.get_owned_stock_quantity">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_owned_stock_quantity">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">get_owned_stock_quantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the quantity of a stock owned by the user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to check.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The quantity of the stock owned by the user.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the stock is not owned by the user.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stock_owned</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stock </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> is not owned&quot;</span><span class="p">)</span>
+        <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">positions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">position</span><span class="p">[</span><span class="s2">&quot;instrument&quot;</span><span class="p">][</span><span class="s2">&quot;symbol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">symbol</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">position</span><span class="p">[</span><span class="s2">&quot;quantity&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Public.get_account_type">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_account_type">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">get_account_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s account type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The user&#39;s account type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_login_info</span><span class="p">[</span><span class="s2">&quot;accounts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Public.get_account_cash">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_account_cash">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="k">def</span> <span class="nf">get_account_cash</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s account cash balance.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The user&#39;s account cash balance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">account_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_portfolio</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">account_info</span><span class="p">[</span><span class="s2">&quot;equity&quot;</span><span class="p">][</span><span class="s2">&quot;cash&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Public.get_symbol_price">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_symbol_price">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">get_symbol_price</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the price of a stock by making a GET request to the quote URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to get the price of.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The price of the stock.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the quote request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">get_quote_url</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;CRYPTO&quot;</span> <span class="ow">in</span> <span class="n">symbol</span><span class="p">:</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">get_crypto_quote_url</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Quote request failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;CRYPTO&quot;</span> <span class="ow">in</span> <span class="n">symbol</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;quotes&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;last&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;last&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Public.get_order_quote">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_order_quote">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">get_order_quote</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets a quote for an order by making a GET request to the order quote URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to get the order quote for.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the order quote URL containing the order quote.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the quote request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">get_quote_url</span><span class="p">(</span><span class="n">symbol</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Quote request failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public.place_order">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.place_order">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">place_order</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">quantity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">order_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">time_in_force</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">limit_price</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">tip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Places an order by making a POST request to the build order URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to place the order for.</span>
+<span class="sd">            quantity: The quantity of the stock to buy or sell, or &quot;all&quot; to sell all owned stock.</span>
+<span class="sd">            side: The side of the order (BUY or SELL).</span>
+<span class="sd">            order_type: The type of the order (MARKET, LIMIT, or STOP).</span>
+<span class="sd">            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).</span>
+<span class="sd">            limit_price: The limit price of the order (required for limit orders).</span>
+<span class="sd">            is_dry_run: Whether to simulate the order without submitting it.</span>
+<span class="sd">            tip: The tip amount for the order.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the build order URL containing the order details.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the order fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span> <span class="n">prodApi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">time_in_force</span> <span class="o">=</span> <span class="n">time_in_force</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">order_type</span> <span class="o">=</span> <span class="n">order_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="n">side</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">time_in_force</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;DAY&quot;</span><span class="p">,</span> <span class="s2">&quot;GTC&quot;</span><span class="p">,</span> <span class="s2">&quot;IOC&quot;</span><span class="p">,</span> <span class="s2">&quot;FOK&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid time in force: </span><span class="si">{</span><span class="n">time_in_force</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;MARKET&quot;</span><span class="p">,</span> <span class="s2">&quot;LIMIT&quot;</span><span class="p">,</span> <span class="s2">&quot;STOP&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid order type: </span><span class="si">{</span><span class="n">order_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;BUY&quot;</span><span class="p">,</span> <span class="s2">&quot;SELL&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid side: </span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tip</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">tip</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># If sell, check safeguards</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;SELL&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_stock_owned</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Stock </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2"> is not owned&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">quantity</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+                <span class="n">quantity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_owned_stock_quantity</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">quantity</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_owned_stock_quantity</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Quantity exceeds owned stock for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># What are they doing?</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;BUY&quot;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantity</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">quantity</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Cannot buy all stock&quot;</span><span class="p">)</span>
+        <span class="c1"># Need to get quote first</span>
+        <span class="n">quote</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_order_quote</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">quote</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Quote not found for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">symbol</span><span class="p">,</span>
+            <span class="s2">&quot;orderSide&quot;</span><span class="p">:</span> <span class="n">side</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">order_type</span><span class="p">,</span>
+            <span class="s2">&quot;timeInForce&quot;</span><span class="p">:</span> <span class="n">time_in_force</span><span class="p">,</span>
+            <span class="s2">&quot;quote&quot;</span><span class="p">:</span> <span class="n">quote</span><span class="p">,</span>
+            <span class="s2">&quot;quantity&quot;</span><span class="p">:</span> <span class="n">quantity</span><span class="p">,</span>
+            <span class="s2">&quot;tipAmount&quot;</span><span class="p">:</span> <span class="n">tip</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">order_type</span> <span class="o">==</span> <span class="s2">&quot;LIMIT&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">limit_price</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Limit price required for limit orders&quot;</span><span class="p">)</span>
+            <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;limitPrice&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">limit_price</span><span class="p">)</span>
+        <span class="c1"># Preflight order endpoint</span>
+        <span class="n">preflight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">preflight_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">preflight</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preflight failed: </span><span class="si">{</span><span class="n">preflight</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Build order endpoint</span>
+        <span class="n">build_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">build_response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Build order failed: </span><span class="si">{</span><span class="n">build_response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">build_response</span> <span class="o">=</span> <span class="n">build_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">build_response</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;orderId&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No order ID: </span><span class="si">{</span><span class="n">build_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">order_id</span> <span class="o">=</span> <span class="n">build_response</span><span class="p">[</span><span class="s2">&quot;orderId&quot;</span><span class="p">]</span>
+        <span class="c1"># Submit order with put</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_dry_run</span><span class="p">:</span>
+            <span class="n">submit_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">submit_put_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">,</span> <span class="n">order_id</span><span class="p">),</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">submit_response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submit order failed: </span><span class="si">{</span><span class="n">submit_response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">submit_response</span> <span class="o">=</span> <span class="n">submit_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="c1"># Empty dict is success</span>
+            <span class="k">if</span> <span class="n">submit_response</span> <span class="o">!=</span> <span class="p">{}:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Order failed: </span><span class="si">{</span><span class="n">submit_response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Check if order was rejected</span>
+        <span class="n">check_response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">submit_get_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">,</span> <span class="n">order_id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_response</span> <span class="o">=</span> <span class="n">check_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="n">check_response</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Order doesn&#39;t always fill immediately, but one of these should work</span>
+        <span class="k">if</span> <span class="n">check_response</span><span class="p">[</span><span class="s2">&quot;rejectionDetails&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">check_response</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">check_response</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;FILLED&quot;</span><span class="p">:</span>
+            <span class="n">check_response</span><span class="p">[</span><span class="s2">&quot;success&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">check_response</span></div>
+
+
+<div class="viewcode-block" id="Public.get_pending_orders">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.get_pending_orders">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">get_pending_orders</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the user&#39;s pending orders by making a GET request to the pending orders URL.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the pending orders URL containing the user&#39;s pending orders.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the pending orders request fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">get_pending_orders_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pending orders request failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public.cancel_order">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.cancel_order">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">cancel_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancels an order by making a DELETE request to the cancel order URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            order_id: The order ID to cancel.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the cancel order URL containing the order details.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the cancel order fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">preflight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">cancel_pending_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">,</span> <span class="n">order_id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">preflight</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preflight failed: </span><span class="si">{</span><span class="n">preflight</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">cancel_pending_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">,</span> <span class="n">order_id</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cancel order failed: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Public.fetch_contract_details">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.fetch_contract_details">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">fetch_contract_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetches contract details for the given option symbol</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The option symbol to fetch contract details for.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: The contract details for the given option symbol.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If request fails (i.e., response status code is not 200).</span>
+<span class="sd">            ValueError: If incomplete contract details are received.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">)</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">contract_details_url</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching contract details: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">contract_data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">contract_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;details&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;quote&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incomplete contract details received.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">contract_data</span></div>
+
+
+<div class="viewcode-block" id="Public._build_option_symbol">
+<a class="viewcode-back" href="../../developer_functions.html#public_invest_api.public.Public._build_option_symbol">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_build_option_symbol</span><span class="p">(</span>
+        <span class="n">stock_symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expiration_date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">option_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">strike_price</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the option symbol for the given parameters.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stock_symbol: The stock symbol.</span>
+<span class="sd">            expiration_date: The expiration date in the format &quot;YYYY-MM-DD&quot;.</span>
+<span class="sd">            option_type: The option type (CALL or PUT).</span>
+<span class="sd">            strike_price: The strike price of the option.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The option symbol for the given parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">formatted_strike</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">strike_price</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="si">:</span><span class="s2">08d</span><span class="si">}</span><span class="s2">&quot;</span>  <span class="c1"># 8 digits padded, in cents</span>
+        <span class="p">)</span>
+        <span class="n">formatted_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">expiration_date</span><span class="p">,</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span>
+            <span class="s2">&quot;%y%m</span><span class="si">%d</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stock_symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}{</span><span class="n">formatted_date</span><span class="si">}{</span><span class="n">option_type</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="si">}{</span><span class="n">formatted_strike</span><span class="si">}</span><span class="s2">-OPTION&quot;</span></div>
+
+
+<div class="viewcode-block" id="Public.submit_options_order">
+<a class="viewcode-back" href="../../public_invest_api.html#public_invest_api.public.Public.submit_options_order">[docs]</a>
+    <span class="nd">@_login_required</span>
+    <span class="nd">@_refresh_check</span>
+    <span class="k">def</span> <span class="nf">submit_options_order</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">symbol</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">quantity</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">limit_price</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">side</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;BUY&quot;</span><span class="p">,</span>
+        <span class="n">time_in_force</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DAY&quot;</span><span class="p">,</span>
+        <span class="n">is_dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">tip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Submits an options order by making a POST request to the build order URL.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            symbol: The stock symbol to place the order for.</span>
+<span class="sd">            quantity: The quantity of the stock to buy or sell.</span>
+<span class="sd">            limit_price: The limit price of the order.</span>
+<span class="sd">            side The side of the order (BUY or SELL).</span>
+<span class="sd">            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).</span>
+<span class="sd">            is_dry_run: Whether to simulate the order without submitting it.</span>
+<span class="sd">            tip: The tip amount for the order.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            The JSON response from the build order URL containing the order details.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the order fails (i.e., response status code is not 200).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token</span><span class="p">,</span> <span class="n">prodApi</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">symbol</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">time_in_force</span> <span class="o">=</span> <span class="n">time_in_force</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">side</span> <span class="o">=</span> <span class="n">side</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">time_in_force</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;DAY&quot;</span><span class="p">,</span> <span class="s2">&quot;GTC&quot;</span><span class="p">,</span> <span class="s2">&quot;IOC&quot;</span><span class="p">,</span> <span class="s2">&quot;FOK&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid time in force: </span><span class="si">{</span><span class="n">time_in_force</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">side</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;BUY&quot;</span><span class="p">,</span> <span class="s2">&quot;SELL&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid side: </span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Need to get details first</span>
+        <span class="n">contract_details</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_contract_details</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contract_details</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Details not found for </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;symbol&quot;</span><span class="p">:</span> <span class="n">symbol</span><span class="p">,</span>
+            <span class="s2">&quot;quantity&quot;</span><span class="p">:</span> <span class="n">quantity</span><span class="p">,</span>
+            <span class="s2">&quot;orderSide&quot;</span><span class="p">:</span> <span class="n">side</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;LIMIT&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;timeInForce&quot;</span><span class="p">:</span> <span class="n">time_in_force</span><span class="p">,</span>
+            <span class="s2">&quot;limitPrice&quot;</span><span class="p">:</span> <span class="n">limit_price</span><span class="p">,</span>
+            <span class="s2">&quot;quote&quot;</span><span class="p">:</span> <span class="n">contract_details</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">][</span><span class="s2">&quot;quote&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;openCloseIndicator&quot;</span><span class="p">:</span> <span class="s2">&quot;OPEN&quot;</span> <span class="k">if</span> <span class="n">side</span> <span class="o">==</span> <span class="s2">&quot;BUY&quot;</span> <span class="k">else</span> <span class="s2">&quot;CLOSE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dryRun&quot;</span><span class="p">:</span> <span class="n">is_dry_run</span><span class="p">,</span>
+            <span class="s2">&quot;tip&quot;</span><span class="p">:</span> <span class="n">tip</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="c1"># Preflight order endpoint</span>
+        <span class="n">preflight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">preflight_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">preflight</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preflight failed: </span><span class="si">{</span><span class="n">preflight</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Place the order</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoints</span><span class="o">.</span><span class="n">build_order_url</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">account_uuid</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Order submission error: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2025, Nelson Dane
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    </body>
+</html>
