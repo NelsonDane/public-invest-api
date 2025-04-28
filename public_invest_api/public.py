@@ -502,7 +502,7 @@ class Public:
             raise Exception(f"Quote request failed: {response.text}")
         if "CRYPTO" in symbol:
             return response.json()["quotes"][0]["last"]
-        return response.json()["price"]
+        return response.json()["last"]
 
     @_login_required
     @_refresh_check
