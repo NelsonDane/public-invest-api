@@ -810,4 +810,21 @@ class Public:
         )
         if response.status_code != 200:
             raise Exception(f"Order submission error: {response.text}")
-        return response.json()
+        build_response = response.json()
+
+        # Submit the order (PUT) using the returned orderId
+        order_id = build_response.get("orderId")
+        if not order_id:
+            raise Exception(f"No orderId returned: {build_response}")
+        
+        if not is_dry_run:
+            submit_url = self.endpoints.submit_put_order_url(self.account_uuid, order_id)
+            submit_response = self.session.put(
+                submit_url,
+                headers=headers,
+                timeout=self.timeout,
+            )
+            if submit_response.status_code != 200:
+                raise Exception(f"Submit order failed: {submit_response.text}")
+
+        return build_response
