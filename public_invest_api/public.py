@@ -810,4 +810,36 @@ class Public:
         )
         if response.status_code != 200:
             raise Exception(f"Order submission error: {response.text}")
-        return response.json()
+        build_response = response.json()
+        # Submit the order (PUT) using the returned orderId
+        order_id = build_response.get("orderId")
+        if not order_id:
+            raise Exception(f"No orderId returned: {build_response}")
+        # Only submit if not a dry run
+        if not is_dry_run:
+            submit_response = self.session.put(
+                self.endpoints.submit_put_order_url(self.account_uuid, order_id),
+                headers=headers,
+                timeout=self.timeout,
+            )
+            if submit_response.status_code != 200:
+                raise Exception(f"Submit order failed: {submit_response.text}")
+            submit_response = submit_response.json()
+            # Empty dict is success
+            if submit_response != {}:
+                raise Exception(f"Order failed: {submit_response}")
+            sleep(1)
+        # Check if order was rejected
+        check_response = self.session.get(
+            self.endpoints.submit_get_order_url(self.account_uuid, order_id),
+            headers=headers,
+            timeout=self.timeout,
+        )
+        check_response = check_response.json()
+        check_response["success"] = False
+        # Order doesn't always fill immediately, but one of these should work
+        if check_response["rejectionDetails"] is None:
+            check_response["success"] = True
+        if check_response["status"] == "FILLED":
+            check_response["success"] = True
+        return check_response
