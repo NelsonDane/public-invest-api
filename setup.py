@@ -2,12 +2,12 @@ from setuptools import setup
 
 setup(
     name="public_invest_api",
-    version="1.3.4",
+    version="1.3.5",
     description="Unofficial Public.com Invest API written in Python Requests",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/NelsonDane/public-invest-api",
     author="Nelson Dane",
     packages=["public_invest_api"],
-    install_requires=["requests==2.32.3"],
+    install_requires=["requests>=2.23.0"],
 )
