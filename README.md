@@ -6,8 +6,14 @@ This is still a very work in progress, so it might have bugs or missing features
 
 ## Quickstart
 
+Install with `pip`:
 ```bash
 pip install public-invest-api
+```
+
+Or install with `uv`:
+```bash
+uv add public-invest-api
 ```
 
 Then see the [examples](https://docs.nelsondane.me/public-invest-api/examples.html) for how to use the API.
