@@ -172,7 +172,9 @@ class Endpoints:
         return f"{self.prodapi}/hstier1service/contract-details/{option_symbol}/BUY"
 
     @staticmethod
-    def build_headers(auth: str | None = None, *, prodapi: bool = False) -> dict[str, str]:
+    def build_headers(
+        auth: str | None = None, *, prodapi: bool = False
+    ) -> dict[str, str]:
         """Build HTTP headers for API requests.
 
         Args:
