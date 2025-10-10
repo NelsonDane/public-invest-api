@@ -1,11 +1,8 @@
-*build/
 __pycache__/
-.venv
+build/
 .env
-*egg-info/
-*.json
-modules.rst
-*.pkl
-_static/
-_templates/
 test*
+*.egg-info/
+proto/
+*_pb2.py
+*_pb2.pyi

@@ -1,0 +1,14 @@
+{
+    "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+     "ruff.nativeServer": "on",
+    "[python]": {
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnType": false,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit",
+        }
+    }
+}
