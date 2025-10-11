@@ -3,6 +3,4 @@ build/
 .env
 test*
 *.egg-info/
-proto/
-*_pb2.py
-*_pb2.pyi
+public_invest_api/models/*

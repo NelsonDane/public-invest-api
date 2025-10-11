@@ -1,3 +1,7 @@
 [submodule "styles"]
 	path = styles
 	url = https://github.com/NelsonDane/styles.git
+
+[submodule "public_invest_openapi_spec"]
+	path = public_invest_openapi_spec
+	url = https://github.com/NelsonDane/public_invest_openapi_spec.git
