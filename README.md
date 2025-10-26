@@ -1,5 +1,9 @@
 # Unofficial Public.com Invest API
 
+## Update
+With the release of the official Public API [python SDK](https://github.com/PublicDotCom/publicdotcom-py), this unofficial implementation is now deprecated. Please move to the official SDK for continued support and updates. Thank you to everyone who contributed to and used this project!
+
+## About
 This is an unofficial API for Public.com. It is a simple Python wrapper around the Public.com requests API. It is not affiliated with Public.com in any way. Use at your own risk.
 
 This is still a very work in progress, so it might have bugs or missing features. Feel free to contribute!
