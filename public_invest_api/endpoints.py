@@ -1,203 +1,213 @@
-import json
-
-
 class Endpoints:
-    def __init__(self):
-        self.baseurl = "https://public.com"
-        self.prodapi = "https://prod-api.154310543964.hellopublic.com"
-        self.ordergateway = f"{self.prodapi}/customerordergateway"
-        self.userservice = f"{self.baseurl}/userservice"
+    """Class for building URL request endpoints."""
 
-    def login_url(self) -> str:
-        """Returns the login URL.
+    def __init__(self) -> None:
+        """Initialize the Endpoints class with base URLs for API services."""
+        self.api = "https://api.public.com"
+        self.api_auth_service = f"{self.api}/userapiauthservice"
+        self.user_api_gateway = f"{self.api}/userapigateway"
 
-        Returns:
-            The login endpoint URL.
-        """
-        return f"{self.userservice}/public/web/login"
-
-    def mfa_url(self) -> str:
-        """Returns the multi-factor authentication (MFA) URL.
+    def jwt_url(self) -> str:
+        """Return the Personal Access Token (JWT) endpoint URL.
 
         Returns:
-            The MFA endpoint URL.
-        """
-        return f"{self.userservice}/public/web/verify-two-factor"
+            The JWT endpoint URL.
 
-    def refresh_url(self) -> str:
-        """Returns the token refresh URL.
+        """
+        return f"{self.api_auth_service}/personal/access-tokens"
+
+    def get_accounts_url(self) -> str:
+        """Return the URL for retrieving user accounts.
 
         Returns:
-            The token refresh endpoint URL.
-        """
-        return f"{self.userservice}/public/web/token-refresh"
+            The accounts endpoint URL.
 
-    def portfolio_url(self, account_uuid: str) -> str:
-        """Constructs the portfolio URL for a given account UUID.
+        """
+        return f"{self.user_api_gateway}/trading/account"
+
+    def get_account_portfolio_v2_url(self, account_id: str) -> str:
+        """Return the URL for retrieving a user's portfolio.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+
         Returns:
             The portfolio endpoint URL.
-        """
-        return f"{self.prodapi}/hstier1service/account/{account_uuid}/portfolio"
 
-    def account_history_url(self, account_uuid: str) -> str:
-        """Constructs the account history URL for a given account UUID.
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/portfolio/v2"
+
+    def get_history_url(self, account_id: str) -> str:
+        """Return the URL for retrieving a user's account history.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+
         Returns:
             The account history endpoint URL.
+
         """
-        return f"{self.prodapi}/hstier2service/history?accountUuids={account_uuid}"
+        return f"{self.user_api_gateway}/trading/{account_id}/history"
 
-    def get_quote_url(self, symbol: str) -> str:
-        """Constructs the URL for fetching a stock quote.
+    def get_all_instruments_url(self) -> str:
+        """Return the URL for retrieving all available instruments.
 
-        Args:
-            symbol: The stock symbol.
         Returns:
-            The stock quote endpoint URL.
-        """
-        return f"{self.prodapi}/tradingservice/quote/equity/{symbol}"
+            The instruments endpoint URL.
 
-    def get_crypto_quote_url(self, symbol: str) -> str:
-        """Constructs the URL for fetching a cryptocurrency quote.
+        """
+        return f"{self.user_api_gateway}/trading/instruments"
+
+    def get_instrument_url(self, symbol: str, symbol_type: str) -> str:
+        """Return the URL for retrieving details of a specific instrument.
 
         Args:
-            symbol: The cryptocurrency symbol.
+            symbol: The symbol of the instrument (e.g., stock ticker).
+            symbol_type: The type of the instrument (e.g., stock, option).
+
         Returns:
-            The crypto quote endpoint URL.
-        """
-        return f"{self.prodapi}/cryptoservice/quotes?symbols={symbol}"
+            The specific instrument endpoint URL.
 
-    def preflight_order_url(self, account_uuid: str) -> str:
-        """Constructs the URL for preflight order validation.
+        """
+        return f"{self.user_api_gateway}/trading/instruments/{symbol}/{symbol_type}"
+
+    def get_quotes_url(self, account_id: str) -> str:
+        """Return the URL for retrieving quotes for specified symbols.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+
         Returns:
-            The preflight order endpoint URL.
-        """
-        return f"{self.ordergateway}/accounts/{account_uuid}/orders/preflight"
+            The quotes endpoint URL.
 
-    def build_order_url(self, account_uuid: str) -> str:
-        """Constructs the URL for building an order.
+        """
+        return f"{self.user_api_gateway}/marketdata/{account_id}/quotes"
+
+    def get_options_expirations_url(self, account_id: str) -> str:
+        """Return the URL for retrieving options expiration dates for a given symbol.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+
         Returns:
-            The build order endpoint URL.
-        """
-        return f"{self.ordergateway}/accounts/{account_uuid}/orders"
+            The options expiration dates endpoint URL.
 
-    def submit_put_order_url(self, account_uuid: str, order_id: str) -> str:
-        """Constructs the URL for submitting a PUT order.
+        """
+        return f"{self.user_api_gateway}/marketdata/{account_id}/options-expirations"
+
+    def get_options_chain_url(self, account_id: str) -> str:
+        """Return the URL for retrieving the options chain for a given symbol and expiration date.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+
+        Returns:
+            The options chain endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/marketdata/{account_id}/options-chain"
+
+    def preflight_single_leg_url(self, account_id: str) -> str:
+        """Return the URL for preflighting a single-leg order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+
+        Returns:
+            The preflight single-leg order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/preflight/single-leg"
+
+    def preflight_multi_leg_url(self, account_id: str) -> str:
+        """Return the URL for preflighting a multi-leg order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+
+        Returns:
+            The preflight multi-leg order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/preflight/multi-leg"
+
+    def place_order_url(self, account_id: str) -> str:
+        """Return the URL for placing an order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+
+        Returns:
+            The place order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/order"
+
+    def place_multi_leg_order_url(self, account_id: str) -> str:
+        """Return the URL for placing a multi-leg order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+
+        Returns:
+            The place multi-leg order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/order/multileg"
+
+    def get_order_url(self, account_id: str, order_id: str) -> str:
+        """Return the URL for retrieving details of a specific order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
             order_id: The unique identifier for the order.
-        Returns:
-            The submit PUT order endpoint URL.
-        """
-        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
 
-    def submit_get_order_url(self, account_uuid: str, order_id: str) -> str:
-        """Constructs the URL for submitting a GET order.
+        Returns:
+            The specific order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/order/{order_id}"
+
+    def cancel_order_url(self, account_id: str, order_id: str) -> str:
+        """Return the URL for canceling a specific order.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
             order_id: The unique identifier for the order.
-        Returns:
-            The submit GET order endpoint URL.
-        """
-        return f"{self.prodapi}/hstier1service/account/{account_uuid}/order/{order_id}"
 
-    def get_pending_orders_url(self, account_uuid: str) -> str:
-        """Constructs the URL for fetching pending orders.
+        Returns:
+            The cancel order endpoint URL.
+
+        """
+        return f"{self.user_api_gateway}/trading/{account_id}/order/{order_id}"
+
+    def get_option_greeks_url(self, account_id: str, osi_option_symbol: str) -> str:
+        """Return the URL for retrieving option greeks for a given symbol and expiration date.
 
         Args:
-            account_uuid: The unique identifier for the account.
+            account_id: The unique identifier for the user's account.
+            osi_option_symbol: The symbol of the option.
+
         Returns:
-            The pending orders endpoint URL.
+            The option greeks endpoint URL.
+
         """
-        return f"{self.prodapi}/hstier2service/history?&&status=PENDING&type=ALL&accountUuids={account_uuid}"
-
-    def cancel_pending_order_url(self, account_uuid: str, order_id: str) -> str:
-        """Constructs the URL for canceling a pending order.
-
-        Args:
-            account_uuid: The unique identifier for the account.
-            order_id: The unique identifier for the order.
-        Returns:
-            The cancel pending order endpoint URL.
-        """
-        return f"{self.ordergateway}/accounts/{account_uuid}/orders/{order_id}"
-
-    def contract_details_url(self, option_symbol: str) -> str:
-        """Constructs the URL for fetching contract details.
-
-        Args:
-            option_symbol: The symbol of the option.
-        Returns:
-            The contract details endpoint URL.
-        """
-        return f"{self.prodapi}/hstier1service/contract-details/{option_symbol}/BUY"
-
-    def build_headers(self, auth: bool = None, prodApi: bool = False) -> dict:
-        """Builds HTTP headers for API requests.
-
-        Args:
-            auth: Authorization token.
-            prodApi: Whether to use the production API authority.
-        Returns:
-            A dictionary containing HTTP headers.
-        """
-        headers = {
-            "authority": "public.com",
-            "accept": "*/*",
-            "accept-language": "en-US,en;q=0.8",
-            "content-type": "application/json",
-            "origin": "https://public.com",
-            "sec-ch-ua": '"Not A(Brand";v="8", "Chromium";v="132", "Brave";v="132"',
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": '"macOS"',
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "sec-gpc": "1",
-            "user-agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) "
-                "Chrome/120.0.0.0 Safari/537.36"
-            ),
-            "x-app-version": "web-1.0.11",
-        }
-        if auth is not None:
-            headers["authorization"] = auth
-        if prodApi:
-            headers["authority"] = self.prodapi.replace("https://", "")
-            headers["sec-fetch-site"] = "cross-site"
-        return headers
+        return f"{self.user_api_gateway}/order-details/{account_id}/{osi_option_symbol}/greeks"
 
     @staticmethod
-    def build_payload(email: str, password: str, code: str = None) -> str:
-        """Builds JSON payload for authentication requests.
+    def build_headers(bearer: str | None = None) -> dict[str, str]:
+        """Build HTTP headers for API requests.
 
         Args:
-            email: The user's email address.
-            password: The user's password.
-            code: The MFA verification code.
+            bearer: Authorization token.
+
         Returns:
-            A JSON-encoded payload string.
+            A dictionary containing HTTP headers.
+
         """
-        payload = {
-            "email": email,
-            "password": password,
+        headers = {
+            "Content-Type": "application/json",
         }
-        if code is None:
-            payload["stayLoggedIn"] = True
-        else:
-            payload["verificationCode"] = code
-        return json.dumps(payload)
+        if bearer is not None:
+            headers["Authorization"] = f"Bearer {bearer}"
+        return headers

@@ -1,11 +1,6 @@
-*build/
 __pycache__/
-.venv
+build/
 .env
-*egg-info/
-*.json
-modules.rst
-*.pkl
-_static/
-_templates/
 test*
+*.egg-info/
+public_invest_api/models/*
