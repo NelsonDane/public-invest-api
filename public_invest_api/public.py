@@ -1,845 +1,569 @@
-import calendar
-import functools
-import os
-import pickle
-from datetime import datetime
-from time import sleep
+import uuid
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from functools import wraps
+from typing import Concatenate, ParamSpec, TypeVar
+from zoneinfo import ZoneInfo, available_timezones
 
 import requests
 
 from public_invest_api.endpoints import Endpoints
+from public_invest_api.models.com.hellopublic.userapigateway.api.rest import account, history, order, portfolio, preflight
+from public_invest_api.models.com.hellopublic.userapigateway.api.rest.marketdata import quote
+from public_invest_api.utils import InvalidAccessTokenError, PublicAPIError
+
+P = ParamSpec("P")
+R = TypeVar("R")
 
 
-def _login_required(func):
-    """Decorator to check if user is logged in by checking if access token is None.
-
-    Args:
-        func: The function to wrap.
-    Returns:
-        The wrapped function.
-    Raises:
-        Exception: If the user is not logged in.
-    """
-
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if self.access_token is None:
-            raise Exception("Login required")
-        return func(self, *args, **kwargs)
-
-    return wrapper
-
-
-def _refresh_check(func):
-    """Decorator to check if the access token is expired and refresh it if necessary.
+def _refresh_check(func: Callable[Concatenate["Public", P], R]) -> Callable[Concatenate["Public", P], R]:
+    """Check if the access token is expired and refresh it if necessary.
 
     Args:
         func: The function to wrap.
+
     Returns:
         The wrapped function.
+
     """
 
-    @functools.wraps(func)
-    def wrapper(self, *args, **kwargs):
-        if self.expires_at is not None and datetime.now().timestamp() > self.expires_at:
-            self._refresh_token()
-        return func(self, *args, **kwargs)
+    @wraps(func)
+    def wrapper(self: "Public", *args: P.args, **kwargs: P.kwargs) -> R:
+        if self.expires_at and datetime.now(tz=self.timezone) >= self.expires_at:
+            self._refresh_jwt_access_token()
+        return func(self, *args, **kwargs)  # type: ignore  # noqa: PGH003
 
     return wrapper
 
 
 class Public:
-    """Initializes the Public.com API client.
+    """Object to interact with the Public Invest API. One object per account/token."""
 
-    Args:
-        filename: The filename to save the cookies to. Defaults to "public_credentials.pkl".
-        path: The path to save the cookies to. Defaults to current directory.
-    """
+    def __init__(self, api_access_token: str, minutes_valid: int = 15, timezone: str = "America/New_York") -> None:
+        """Initialize the Public.com API client.
 
-    def __init__(self, filename: str = "public_credentials.pkl", path: str = None):
+        Args:
+            api_access_token: The API access token to use for authentication.
+            minutes_valid: The number of minutes the JWT access token is valid for. Defaults to 15.
+            timezone: The timezone to use for the API requests. Defaults to None, which uses the system timezone.
+
+        Raises:
+            ValueError: If the provided timezone is not valid.
+            InvalidAccessTokenError: If the provided API access token is not valid.
+
+        """
+        if timezone not in available_timezones():
+            msg = f"Invalid timezone: {timezone}. Available timezones: {available_timezones()}"
+            raise ValueError(msg)
         self.session = requests.Session()
         self.endpoints = Endpoints()
+        self.api_access_token = api_access_token
         self.session.headers.update(self.endpoints.build_headers())
-        self.access_token = None
-        self.account_uuid = None
-        self.account_number = None
-        self.all_login_info = None
         self.timeout = 10
-        self.expires_at = None
-        self.filename = filename
-        self.path = path
-        self._load_cookies()
-
-    def _save_cookies(self) -> None:
-        """
-        Save cookies to file
-        """
-        filename = self.filename
-        if self.path is not None:
-            filename = os.path.join(self.path, filename)
-        if self.path is not None and not os.path.exists(self.path):
-            os.makedirs(self.path)
-        with open(filename, "wb") as f:
-            pickle.dump(self.session.cookies, f)
-
-    def _load_cookies(self) -> bool:
-        """Load cookies from file
-
-        Returns:
-            bool: True if cookies were loaded, False otherwise
-        """
-        filename = self.filename
-        if self.path is not None:
-            filename = os.path.join(self.path, filename)
-        if not os.path.exists(filename):
-            return False
-        with open(filename, "rb") as f:
-            self.session.cookies.update(pickle.load(f))
-        return True
-
-    def _clear_cookies(self) -> None:
-        """
-        Clear cookies and remove file
-        """
-        filename = self.filename
-        if self.path is not None:
-            filename = os.path.join(self.path, filename)
-        if os.path.exists(filename):
-            os.remove(filename)
-        self.session.cookies.clear()
-
-    def login(
-        self,
-        username: str = None,
-        password: str = None,
-        wait_for_2fa: str = True,
-        code: str = None,
-    ) -> dict:
-        """Logs in to the Public.com API by making a POST request to the login URL.
-
-        Args:
-            username: The email to log in with.
-            password: The password to log in with.
-            wait_for_2fa: Whether to wait for 2FA code to be entered or raise exception.
-            code: The 2FA code to enter when re-calling login.
-        Returns:
-            The JSON response from the login URL containing the access token.
-        Raises:
-            Exception: If the login fails (i.e., response status code is not 200).
-        """
-        if username is None or password is None:
-            raise Exception("Username or password not provided")
-        # See if we can refresh login
-        refresh_success = False
+        self.timezone = ZoneInfo(timezone)
+        self.minutes_valid = minutes_valid
         try:
-            response = self._refresh_token()
-            refresh_success = True
-        except Exception:
-            pass
-        headers = self.session.headers
-        need_2fa = True
-        if code is None and not refresh_success:
-            payload = self.endpoints.build_payload(username, password)
-            self._load_cookies()
-            response = self.session.post(
-                self.endpoints.login_url(),
-                headers=headers,
-                data=payload,
-                timeout=self.timeout,
-            )
-            if response.status_code != 200:
-                # Perhaps cookies are expired
-                self._clear_cookies()
-                response = self.session.post(
-                    self.endpoints.login_url(),
-                    headers=headers,
-                    data=payload,
-                    timeout=self.timeout,
-                )
-            if response.status_code != 200:
-                print(response.text)
-                raise Exception("Login failed, check credentials")
-            response = response.json()
-            if response["twoFactorResponse"] is not None:
-                self._clear_cookies()
-                phone = response["twoFactorResponse"]["maskedPhoneNumber"]
-                print(f"2FA required, code sent to phone number {phone}...")
-                if not wait_for_2fa:
-                    raise Exception("2FA required: please provide code")
-                code = input("Enter code: ")
-            else:
-                need_2fa = False
-        if need_2fa and not refresh_success:
-            payload = self.endpoints.build_payload(username, password, code)
-            response = self.session.post(
-                self.endpoints.mfa_url(),
-                headers=headers,
-                data=payload,
-                timeout=self.timeout,
-            )
-            if response.status_code != 200:
-                raise Exception("MFA Login failed, check credentials and code")
-            response = self.session.post(
-                self.endpoints.login_url(),
-                headers=headers,
-                data=payload,
-                timeout=self.timeout,
-            )
-            if response.status_code != 200:
-                raise Exception("Login failed, check credentials")
-            response = response.json()
-        # Get info from response
-        if "loginResponse" in response:
-            response = response["loginResponse"]
-        self.access_token = response["accessToken"]
-        self.account_uuid = response["accounts"][0]["accountUuid"]
-        self.account_number = response["accounts"][0]["account"]
-        self.expires_at = (int(response["serverTime"]) / 1000) + int(
-            response["expiresIn"]
-        )
-        self.all_login_info = response
-        self._save_cookies()
-        return response
+            self._refresh_jwt_access_token()
+        except PublicAPIError as e:
+            raise InvalidAccessTokenError from e
 
-    def _refresh_token(self) -> dict:
-        """Refreshes the access token by making a POST request to the refresh URL.
+    def _refresh_jwt_access_token(self) -> None:
+        """Get a JWT access token by making a POST request to the JWT URL. https://public.com/api/docs/resources/authorization/create-personal-access-token.
 
-        Returns:
-            The JSON response from the refresh URL containing the new access token.
         Raises:
-            Exception: If the token refresh fails (i.e., response status code is not 200 or 2FA is required).
+            PublicAPIError: If the JWT request fails (doesn't return 200).
+
         """
-        headers = self.session.headers
+        request_body = {
+            "validityInMinutes": self.minutes_valid,
+            "secret": self.api_access_token,
+        }
         response = self.session.post(
-            self.endpoints.refresh_url(), headers=headers, timeout=self.timeout
+            url=self.endpoints.jwt_url(),
+            headers=self.session.headers,
+            json=request_body,
+            timeout=self.timeout,
         )
-        if response.status_code != 200:
-            raise Exception("Token refresh failed")
+        if not response.ok:
+            msg = f"Access Token (JWT) failed with status code {response.status_code}: {response.text}"
+            raise PublicAPIError(msg)
         response = response.json()
-        self.access_token = response["accessToken"]
-        self.expires_at = (int(response["serverTime"]) / 1000) + int(
-            response["expiresIn"]
-        )
-        self.account_uuid = response["accounts"][0]["accountUuid"]
-        self._save_cookies()
-        return response
+        # Update session headers with new bearer token
+        self.session.headers.update(self.endpoints.build_headers(bearer=response["accessToken"]))  # type: ignore[index]
+        self.expires_at = datetime.now(tz=self.timezone) + timedelta(minutes=self.minutes_valid)
 
-    @_login_required
     @_refresh_check
-    def get_portfolio(self) -> dict:
-        """Gets the user's portfolio by making a GET request to the portfolio URL.
+    def get_accounts(self) -> list[account.AccountSettings]:
+        """Retrieve financial accounts associated with the user. https://public.com/api/docs/resources/list-accounts/get-accounts.
 
         Returns:
-            The JSON response from the portfolio URL containing the user's portfolio.
-        Raises:
-            Exception: If the portfolio request fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
-        portfolio = self.session.get(
-            self.endpoints.portfolio_url(self.account_uuid),
-            headers=headers,
-            timeout=self.timeout,
-        )
-        if portfolio.status_code != 200:
-            raise Exception(f"Portfolio request failed: {portfolio.text}")
-        return portfolio.json()
+            AccountSettings: The account settings for the user.
 
-    @staticmethod
-    def _history_filter_date(date: str) -> dict:
-        """Returns the start and end date for the given date range.
+        Raises:
+            PublicAPIError: If the accounts request fails (doesn't return 200).
+
+        """
+        response = self.session.get(url=self.endpoints.get_accounts_url(), headers=self.session.headers, timeout=self.timeout)
+        if not response.ok:
+            msg = f"Failed to retrieve accounts: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return account.AccountSettingsResponse(**response.json()).accounts or []
+
+    @_refresh_check
+    def get_portfolio(self, account_id: str) -> portfolio.GatewayPortfolioAccountV2:
+        """Retrieve the portfolio for a specific account. https://public.com/api/docs/resources/account-details/get-account-portfolio-v2.
 
         Args:
-            date The date range (all, current_month, last_month, this_year, last_year).
-        Returns:
-            The start and end date for the given date range in the format yyyy-mm-dd.
-        """
-        if date == "all":
-            return {}
-        now = datetime.now()
-        if date == "current_month":
-            start_date = datetime(now.year, now.month, 1)
-            end_date = datetime(
-                now.year, now.month, calendar.monthrange(now.year, now.month)[1]
-            )
-        elif date == "last_month":
-            start_date = datetime(now.year, now.month - 1, 1)
-            end_date = datetime(
-                now.year, now.month - 1, calendar.monthrange(now.year, now.month - 1)[1]
-            )
-        elif date == "this_year":
-            start_date = datetime(now.year, 1, 1)
-            end_date = datetime(now.year, 12, 31)
-        elif date == "last_year":
-            start_date = datetime(now.year - 1, 1, 1)
-            end_date = datetime(now.year - 1, 12, 31)
-        return {
-            "dateFrom": start_date.strftime("%Y-%m-%d"),
-            "dateTo": end_date.strftime("%Y-%m-%d"),
-        }
+            account_id: The unique identifier for the user's account.
 
-    @_login_required
+        Returns:
+            GatewayPortfolioAccountV2: The portfolio information for the specified account.
+
+        Raises:
+            PublicAPIError: If the portfolio request fails (doesn't return 200).
+
+        """
+        response = self.session.get(url=self.endpoints.get_account_portfolio_v2_url(account_id), headers=self.session.headers, timeout=self.timeout)
+        if not response.ok:
+            msg = f"Failed to retrieve portfolio: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return portfolio.GatewayPortfolioAccountV2(**response.json())
+
     @_refresh_check
-    def get_account_history(
+    def get_history(
         self,
-        date: str = "all",
-        asset_class: str = "all",
-        min_amount: int = None,
-        max_amount: int = None,
-        transaction_type: str | list = "all",
-        status: str | list = "all",
-        nextToken: str = None,
-    ) -> dict:
-        """Returns the user's account history from https://public.com/settings/history.
-        The filters match the filters on the website.
+        account_id: str,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        page_size: int | None = None,
+        next_token: str | None = None,
+    ) -> history.GatewayHistoryResponsePage:
+        """Retrieve the account history for a specific account. https://public.com/api/docs/resources/account-details/get-history.
 
         Args:
-            date: The date range (all, current_month, last_month, this_year, last_year).
-            asset_class: The asset class (all, stocks_and_etfs, options, bonds, crypto). For multiple, pass a list: ["stocks_and_etfs", "options"].
-            min_amount: The minimum amount. If both min_amount and max_amount are None, no filter is applied.
-            max_amount: The maximum amount. If both min_amount and max_amount are None, no filter is applied.
-            transaction_type: The transaction type (all, buy, sell, multi_leg, deposit, withdrawal, 6m_treasury_bills, acat, option_event, interest_dividend_maturity, reward, subscription, misc). For multiple, pass a list: ["buy", "sell"].
-            status: The status (all, completed, rejected, cancelled, pending). For multiple, pass a list: ["completed", "rejected"].
-            nextToken: The next token for pagination.
+            account_id: The unique identifier for the user's account.
+            start_date: The start date for the history query. If None, no start date is applied.
+            end_date: The end date for the history query. If None, no end date is applied.
+            page_size: The number of results to return per page. If None, the default page size is used.
+            next_token: The token for the next page of results. If None, the first page is retrieved.
+
         Returns:
-            The JSON response from the account history URL containing the user's account history with keys:
-                - pendingTransactions (list): A list of pending transactions.
-                - transactions (list): A list of transactions.
-                - accountCreated (bool?): Whether the account was created? Not sure, mine is null.
-                - nextToken (str): The next token for pagination.
+            GatewayHistoryResponsePage: The account history information for the specified account.
 
         Raises:
-            Exception: If the account history request fails (i.e., response status code is not 200).
+            PublicAPIError: If the history request fails (doesn't return 200).
+
         """
-        headers = self.endpoints.build_headers(self.access_token)
-        url = self.endpoints.account_history_url(self.account_uuid)
         params = {}
-        # Verifications
-        if date not in ["all", "current_month", "last_month", "this_year", "last_year"]:
-            raise Exception(f"Invalid date: {date}")
-        if asset_class != "all":
-            if not isinstance(asset_class, list):
-                asset_class = [asset_class]
-            for asset in asset_class:
-                if asset not in [
-                    "all",
-                    "stocks_and_etfs",
-                    "options",
-                    "bonds",
-                    "crypto",
-                ]:
-                    raise Exception(f"Invalid asset class: {asset}")
-        if min_amount is not None and not isinstance(min_amount, int):
-            raise Exception("Invalid min amount. Must be int.")
-        if max_amount is not None and not isinstance(max_amount, int):
-            raise Exception("Invalid max amount. Must be int.")
-        if transaction_type != "all":
-            if not isinstance(transaction_type, list):
-                transaction_type = [transaction_type]
-            for t in transaction_type:
-                if t not in [
-                    "all",
-                    "buy",
-                    "sell",
-                    "multi_leg",
-                    "deposit",
-                    "withdrawal",
-                    "6m_treasury_bills",
-                    "acat",
-                    "option_event",
-                    "interest_dividend_maturity",
-                    "reward",
-                    "subscription",
-                    "misc",
-                ]:
-                    raise Exception(f"Invalid type: {t}")
-        if status != "all":
-            if not isinstance(status, list):
-                status = [status]
-            for s in status:
-                if s not in ["all", "completed", "rejected", "cancelled", "pending"]:
-                    raise Exception(f"Invalid status: {s}")
-        # Date filter
-        date_params = self._history_filter_date(date)
-        if date_params != {}:
-            params.update(date_params)
-        # Asset class filter
-        if asset_class != "all":
-            asset_class_map = {
-                "stocks_and_etfs": "EQUITY",
-                "options": "OPTION",
-                "bonds": "BOND",
-                "crypto": "CRYPTO",
-            }
-            params["assetClass"] = [asset_class_map[asset] for asset in asset_class]
-        # Amount filter
-        if min_amount is not None:
-            params["amountGreaterThanEqualTo"] = min_amount
-        if max_amount is not None:
-            params["amountLessThanEqualTo"] = max_amount
-        # Type filter
-        if transaction_type != "all":
-            type_map = {
-                "buy": "PURCHASE",
-                "sell": "SALE",
-                "multi_leg": "MULTI_LEG_ORDER",
-                "deposit": "DEPOSIT",
-                "withdrawal": "WITHDRAWAL",
-                "6m_treasury_bills": "TREASURY_ACCOUNT_TRANSFER",
-                "acat": "ACAT",
-                "option_event": "OPTION_EVENTS",
-                "interest_dividend_maturity": "INTEREST",
-                "reward": "STOCK_REWARD",
-                "subscription": "SUBSCRIPTION",
-                "misc": "OTHER",
-            }
-            params["type"] = [type_map[t] for t in transaction_type]
-        # Status filter
-        if status != "all":
-            params["status"] = [s.upper() for s in status]
-        # Next token
-        if nextToken is not None:
-            params["nextToken"] = nextToken
-        # Make the request
-        response = self.session.get(
-            url, headers=headers, params=params, timeout=self.timeout
-        )
-        if response.status_code != 200:
-            raise Exception(f"Account history request failed: {response.text}")
-        return response.json()
+        # Dates in ISO 8601 format with timezone
+        if start_date is not None:
+            params["start"] = start_date.astimezone(self.timezone).isoformat()
+        if end_date is not None:
+            params["end"] = end_date.astimezone(self.timezone).isoformat()
+        if page_size is not None:
+            params["page_size"] = str(page_size)
+        if next_token is not None:
+            params["next_token"] = next_token
+        if params != {}:
+            self.session.params = params
+        response = self.session.get(url=self.endpoints.get_history_url(account_id), headers=self.session.headers, timeout=self.timeout)
+        if not response.ok:
+            msg = f"Failed to retrieve account history: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return history.GatewayHistoryResponsePage(**response.json())
 
-    @_login_required
-    def get_account_number(self) -> str:
-        """Gets the user's account number.
-
-        Returns:
-            The user's account number.
-        """
-        return self.account_number
-
-    @_login_required
-    def get_positions(self) -> list:
-        """Gets the user's positions by making a GET request to the positions URL.
-
-        Returns:
-            The JSON response from the positions URL containing the user's positions.
-        Raises:
-            Exception: If the positions request fails (i.e., response status code is not 200).
-        """
-        account_info = self.get_portfolio()
-        return account_info["positions"]
-
-    @_login_required
-    def is_stock_owned(self, symbol: str) -> bool:
-        """Checks if the user owns a stock by checking the user's positions.
-
-        Args:
-            symbol: The stock symbol to check.
-        Returns:
-            True if the user owns the stock, False otherwise.
-        """
-        positions = self.get_positions()
-        for position in positions:
-            if position["instrument"]["symbol"] == symbol:
-                return True
-        return False
-
-    @_login_required
-    def get_owned_stock_quantity(self, symbol: str) -> float | None:
-        """Gets the quantity of a stock owned by the user.
-
-        Args:
-            symbol: The stock symbol to check.
-        Returns:
-            The quantity of the stock owned by the user.
-        Raises:
-            Exception: If the stock is not owned by the user.
-        """
-        if not self.is_stock_owned(symbol):
-            raise Exception(f"Stock {symbol} is not owned")
-        positions = self.get_positions()
-        for position in positions:
-            if position["instrument"]["symbol"] == symbol:
-                return float(position["quantity"])
-        return None
-
-    @_login_required
-    def get_account_type(self) -> str:
-        """Gets the user's account type.
-
-        Returns:
-            The user's account type.
-        """
-        return self.all_login_info["accounts"][0]["type"]
-
-    @_login_required
-    def get_account_cash(self) -> float:
-        """Gets the user's account cash balance.
-
-        Returns:
-            The user's account cash balance.
-        """
-        account_info = self.get_portfolio()
-        return account_info["equity"]["cash"]
-
-    @_login_required
     @_refresh_check
-    def get_symbol_price(self, symbol: str) -> float:
-        """Gets the price of a stock by making a GET request to the quote URL.
-
-        Args:
-            symbol: The stock symbol to get the price of.
-        Returns:
-            The price of the stock.
-        Raises:
-            Exception: If the quote request fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token)
-        url = self.endpoints.get_quote_url(symbol)
-        if "CRYPTO" in symbol:
-            url = self.endpoints.get_crypto_quote_url(symbol)
-        response = self.session.get(url, headers=headers, timeout=self.timeout)
-        if response.status_code != 200:
-            raise Exception(f"Quote request failed: {response.text}")
-        if "CRYPTO" in symbol:
-            return response.json()["quotes"][0]["last"]
-        return response.json()["last"]
-
-    @_login_required
-    @_refresh_check
-    def get_order_quote(self, symbol: str) -> dict:
-        """Gets a quote for an order by making a GET request to the order quote URL.
-
-        Args:
-            symbol: The stock symbol to get the order quote for.
-        Returns:
-            The JSON response from the order quote URL containing the order quote.
-        Raises:
-            Exception: If the quote request fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token)
-        response = self.session.get(
-            self.endpoints.get_quote_url(symbol),
-            headers=headers,
-            timeout=self.timeout,
-        )
-        if response.status_code != 200:
-            raise Exception(f"Quote request failed: {response.text}")
-        return response.json()
-
-    @_login_required
-    @_refresh_check
-    def place_order(
+    def get_all_instruments(
         self,
-        symbol: str,
-        quantity: float,
-        side: str,
-        order_type: str,
-        time_in_force: str,
-        limit_price: float = None,
-        is_dry_run: bool = False,
-        tip: float = None,
-    ) -> dict:
-        """Places an order by making a POST request to the build order URL.
+        type_filter: list[history.SecurityType] | None = None,
+        trading_filter: list[order.Trading] | None = None,
+        fractional_trading_filter: list[order.FractionalTrading] | None = None,
+        option_trading_filter: list[order.OptionTrading] | None = None,
+        option_spread_trading_filter: list[order.OptionSpreadTrading] | None = None,
+    ) -> list[order.ApiInstrumentDto]:
+        """Get all instruments available to the user. https://public.com/api/docs/resources/instrument-details/get-all-instruments.
 
         Args:
-            symbol: The stock symbol to place the order for.
-            quantity: The quantity of the stock to buy or sell, or "all" to sell all owned stock.
-            side: The side of the order (BUY or SELL).
-            order_type: The type of the order (MARKET, LIMIT, or STOP).
-            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).
-            limit_price: The limit price of the order (required for limit orders).
-            is_dry_run: Whether to simulate the order without submitting it.
-            tip: The tip amount for the order.
-        Returns:
-            The JSON response from the build order URL containing the order details.
-        Raises:
-            Exception: If the order fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
-        symbol = symbol.upper()
-        time_in_force = time_in_force.upper()
-        order_type = order_type.upper()
-        side = side.upper()
-        if time_in_force not in ["DAY", "GTC", "IOC", "FOK"]:
-            raise Exception(f"Invalid time in force: {time_in_force}")
-        if order_type not in ["MARKET", "LIMIT", "STOP"]:
-            raise Exception(f"Invalid order type: {order_type}")
-        if side not in ["BUY", "SELL"]:
-            raise Exception(f"Invalid side: {side}")
-        if tip == 0:
-            tip = None
-        # If sell, check safeguards
-        if side == "SELL":
-            if not self.is_stock_owned(symbol):
-                raise Exception(f"Stock {symbol} is not owned")
-            if isinstance(quantity, str) and quantity.lower() == "all":
-                quantity = self.get_owned_stock_quantity(symbol)
-            if quantity > self.get_owned_stock_quantity(symbol):
-                raise Exception(f"Quantity exceeds owned stock for {symbol}")
-        # What are they doing?
-        if side == "BUY" and isinstance(quantity, str) and quantity.lower() == "all":
-            raise Exception("Cannot buy all stock")
-        # Need to get quote first
-        quote = self.get_order_quote(symbol)
-        if quote is None:
-            raise Exception(f"Quote not found for {symbol}")
-        payload = {
-            "symbol": symbol,
-            "orderSide": side,
-            "type": order_type,
-            "timeInForce": time_in_force,
-            "quote": quote,
-            "quantity": quantity,
-            "tipAmount": tip,
-        }
-        if order_type == "LIMIT":
-            if limit_price is None:
-                raise Exception("Limit price required for limit orders")
-            payload["limitPrice"] = float(limit_price)
-        # Preflight order endpoint
-        preflight = self.session.post(
-            self.endpoints.preflight_order_url(self.account_uuid),
-            headers=headers,
-            json=payload,
-            timeout=self.timeout,
-        )
-        if preflight.status_code != 200:
-            raise Exception(f"Preflight failed: {preflight.text}")
-        # Build order endpoint
-        build_response = self.session.post(
-            self.endpoints.build_order_url(self.account_uuid),
-            headers=headers,
-            json=payload,
-            timeout=self.timeout,
-        )
-        if build_response.status_code != 200:
-            raise Exception(f"Build order failed: {build_response.text}")
-        build_response = build_response.json()
-        if build_response.get("orderId") is None:
-            raise Exception(f"No order ID: {build_response}")
-        order_id = build_response["orderId"]
-        # Submit order with put
-        if not is_dry_run:
-            submit_response = self.session.put(
-                self.endpoints.submit_put_order_url(self.account_uuid, order_id),
-                headers=headers,
-                timeout=self.timeout,
-            )
-            if submit_response.status_code != 200:
-                raise Exception(f"Submit order failed: {submit_response.text}")
-            submit_response = submit_response.json()
-            # Empty dict is success
-            if submit_response != {}:
-                raise Exception(f"Order failed: {submit_response}")
-            sleep(1)
-        # Check if order was rejected
-        check_response = self.session.get(
-            self.endpoints.submit_get_order_url(self.account_uuid, order_id),
-            headers=headers,
-            timeout=self.timeout,
-        )
-        check_response = check_response.json()
-        check_response["success"] = False
-        # Order doesn't always fill immediately, but one of these should work
-        if check_response["rejectionDetails"] is None:
-            check_response["success"] = True
-        if check_response["status"] == "FILLED":
-            check_response["success"] = True
-        return check_response
-
-    @_login_required
-    @_refresh_check
-    def get_pending_orders(self) -> dict:
-        """Gets the user's pending orders by making a GET request to the pending orders URL.
+            type_filter: List of security types to filter by.
+            trading_filter: List of trading types to filter by.
+            fractional_trading_filter: List of fractional trading types to filter by.
+            option_trading_filter: List of option trading types to filter by.
+            option_spread_trading_filter: List of option spread trading types to filter by.
 
         Returns:
-            The JSON response from the pending orders URL containing the user's pending orders.
+            The JSON response from the all instruments URL containing the user's instruments.
+
         Raises:
-            Exception: If the pending orders request fails (i.e., response status code is not 200).
+            PublicAPIError: If the all instruments request fails (i.e., response status code is not 200).
+
         """
-        headers = self.endpoints.build_headers(self.access_token)
+        params = {}
+        if type_filter:
+            params["typeFilter"] = ",".join([t.value for t in type_filter])
+        if trading_filter:
+            params["tradingFilter"] = ",".join([t.value for t in trading_filter])
+        if fractional_trading_filter:
+            params["fractionalTradingFilter"] = ",".join([t.value for t in fractional_trading_filter])
+        if option_trading_filter:
+            params["optionTradingFilter"] = ",".join([t.value for t in option_trading_filter])
+        if option_spread_trading_filter:
+            params["optionSpreadTradingFilter"] = ",".join([t.value for t in option_spread_trading_filter])
         response = self.session.get(
-            self.endpoints.get_pending_orders_url(self.account_uuid),
-            headers=headers,
+            url=self.endpoints.get_all_instruments_url(),
+            headers=self.session.headers,
+            params=params,
             timeout=self.timeout,
         )
-        if response.status_code != 200:
-            raise Exception(f"Pending orders request failed: {response.text}")
-        return response.json()
+        if not response.ok:
+            msg = f"All instruments request failed with status code {response.status_code}: {response.text}"
+            raise PublicAPIError(msg)
+        return order.ApiInstrumentResponse(**response.json()).instruments or []
 
-    @_login_required
-    @_refresh_check
-    def cancel_order(self, order_id: str) -> dict:
-        """Cancels an order by making a DELETE request to the cancel order URL.
+    def get_instrument(self, symbol: str, symbol_type: order.Type) -> order.ApiInstrumentDto:
+        """Get a specific instrument by symbol and type.
 
         Args:
-            order_id: The order ID to cancel.
+            symbol: The stock symbol to get the instrument for.
+            symbol_type: The type of the stock symbol.
+
         Returns:
-            The JSON response from the cancel order URL containing the order details.
+            The instrument matching the symbol and type.
+
         Raises:
-            Exception: If the cancel order fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token)
-        preflight = self.session.options(
-            self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
-            headers=headers,
-            timeout=self.timeout,
-        )
-        if preflight.status_code != 200:
-            raise Exception(f"Preflight failed: {preflight.text}")
-        response = self.session.delete(
-            self.endpoints.cancel_pending_order_url(self.account_uuid, order_id),
-            headers=headers,
-            timeout=self.timeout,
-        )
-        if response.status_code != 200:
-            raise Exception(f"Cancel order failed: {response.text}")
-        return response.json()
+            PublicAPIError: If the instrument request fails (i.e., response status code is not 200).
 
-    @_login_required
+        """
+        response = self.session.get(
+            url=self.endpoints.get_instrument_url(symbol, symbol_type.value),
+            headers=self.session.headers,
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to retrieve instrument {symbol}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return order.ApiInstrumentDto(**response.json())
+
     @_refresh_check
-    def fetch_contract_details(self, symbol: str) -> dict:
-        """Fetches contract details for the given option symbol
+    def get_quotes(self, account_id: str, instruments: list[order.GatewayOrderInstrument]) -> list[quote.GatewayQuote]:
+        """Get quotes for the given instruments. https://public.com/api/docs/resources/market-data/get-quotes.
 
         Args:
-            symbol: The option symbol to fetch contract details for.
+            account_id: The unique identifier for the user's account.
+            instruments: List of instruments to query quotes.
+
         Returns:
-            dict: The contract details for the given option symbol.
+            A GatewayQuoteResponse object containing the quotes for the specified instruments.
+
         Raises:
-            Exception: If request fails (i.e., response status code is not 200).
-            ValueError: If incomplete contract details are received.
+            PublicAPIError: If the quotes request fails (i.e., response status code is not 200).
+
         """
-        headers = self.endpoints.build_headers(self.access_token)
-        url = self.endpoints.contract_details_url(symbol)
-        response = self.session.get(url, headers=headers, timeout=self.timeout)
-        if response.status_code != 200:
-            raise Exception(f"Error fetching contract details: {response.text}")
-        contract_data = response.json()
-        if not contract_data.get("details", {}).get("quote"):
-            raise ValueError("Incomplete contract details received.")
-        return contract_data
-
-    @staticmethod
-    def _build_option_symbol(
-        stock_symbol: str, expiration_date: str, option_type: str, strike_price: float
-    ) -> str:
-        """Builds the option symbol for the given parameters.
-
-        Args:
-            stock_symbol: The stock symbol.
-            expiration_date: The expiration date in the format "YYYY-MM-DD".
-            option_type: The option type (CALL or PUT).
-            strike_price: The strike price of the option.
-        Returns:
-            The option symbol for the given parameters.
-        """
-        formatted_strike = (
-            f"{int(float(strike_price) * 1000):08d}"  # 8 digits padded, in cents
-        )
-        formatted_date = datetime.strptime(expiration_date, "%Y-%m-%d").strftime(
-            "%y%m%d"
-        )
-        return f"{stock_symbol.upper()}{formatted_date}{option_type.upper()}{formatted_strike}-OPTION"
-
-    @_login_required
-    @_refresh_check
-    def submit_options_order(
-        self,
-        symbol: str,
-        quantity: float,
-        limit_price: float,
-        side: str = "BUY",
-        time_in_force: str = "DAY",
-        is_dry_run: bool = False,
-        tip: float | None = None,
-    ) -> dict:
-        """Submits an options order by making a POST request to the build order URL.
-
-        Args:
-            symbol: The stock symbol to place the order for.
-            quantity: The quantity of the stock to buy or sell.
-            limit_price: The limit price of the order.
-            side The side of the order (BUY or SELL).
-            time_in_force: The time in force of the order (DAY, GTC, IOC, or FOK).
-            is_dry_run: Whether to simulate the order without submitting it.
-            tip: The tip amount for the order.
-        Returns:
-            The JSON response from the build order URL containing the order details.
-        Raises:
-            Exception: If the order fails (i.e., response status code is not 200).
-        """
-        headers = self.endpoints.build_headers(self.access_token, prodApi=True)
-        symbol = symbol.upper()
-        time_in_force = time_in_force.upper()
-        side = side.upper()
-        if time_in_force not in ["DAY", "GTC", "IOC", "FOK"]:
-            raise Exception(f"Invalid time in force: {time_in_force}")
-        if side not in ["BUY", "SELL"]:
-            raise Exception(f"Invalid side: {side}")
-        # Need to get details first
-        contract_details = self.fetch_contract_details(symbol)
-        if contract_details is None:
-            raise Exception(f"Details not found for {symbol}")
-        payload = {
-            "symbol": symbol,
-            "quantity": quantity,
-            "orderSide": side,
-            "type": "LIMIT",
-            "timeInForce": time_in_force,
-            "limitPrice": limit_price,
-            "quote": contract_details["details"]["quote"],
-            "openCloseIndicator": "OPEN" if side == "BUY" else "CLOSE",
-            "dryRun": is_dry_run,
-            "tip": tip,
-        }
-        # Preflight order endpoint
-        preflight = self.session.post(
-            self.endpoints.preflight_order_url(self.account_uuid),
-            headers=headers,
-            json=payload,
-            timeout=self.timeout,
-        )
-        if preflight.status_code != 200:
-            raise Exception(f"Preflight failed: {preflight.text}")
-        # Place the order
         response = self.session.post(
-            self.endpoints.build_order_url(self.account_uuid),
-            headers=headers,
-            json=payload,
+            url=self.endpoints.get_quotes_url(account_id=account_id),
+            headers=self.session.headers,
+            json=quote.GatewayQuoteRequest(instruments=instruments).model_dump(),
             timeout=self.timeout,
         )
-        if response.status_code != 200:
-            raise Exception(f"Order submission error: {response.text}")
-        build_response = response.json()
-        # Submit the order (PUT) using the returned orderId
-        order_id = build_response.get("orderId")
-        if not order_id:
-            raise Exception(f"No orderId returned: {build_response}")
-        # Only submit if not a dry run
-        if not is_dry_run:
-            submit_response = self.session.put(
-                self.endpoints.submit_put_order_url(self.account_uuid, order_id),
-                headers=headers,
-                timeout=self.timeout,
-            )
-            if submit_response.status_code != 200:
-                raise Exception(f"Submit order failed: {submit_response.text}")
-            submit_response = submit_response.json()
-            # Empty dict is success
-            if submit_response != {}:
-                raise Exception(f"Order failed: {submit_response}")
-            sleep(1)
-        # Check if order was rejected
-        check_response = self.session.get(
-            self.endpoints.submit_get_order_url(self.account_uuid, order_id),
-            headers=headers,
+        if not response.ok:
+            msg = f"Failed to retrieve quotes for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return quote.GatewayQuoteResponse(**response.json()).quotes or []
+
+    @_refresh_check
+    def get_option_expirations(self, account_id: str, instrument: order.GatewayOrderInstrument) -> quote.GatewayOptionExpirationsResponse:
+        """Get option expirations for a given instrument. https://public.com/api/docs/resources/market-data/get-option-expirations.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            instrument: The instrument to get option expirations for.
+
+        Returns:
+            A GatewayOptionExpirationsResponse object containing the option expirations for the specified instrument.
+
+        Raises:
+            PublicAPIError: If the option expirations request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.get_options_expirations_url(account_id=account_id),
+            headers=self.session.headers,
+            json=quote.GatewayOptionExpirationsRequest(instrument=instrument).model_dump(),
             timeout=self.timeout,
         )
-        check_response = check_response.json()
-        check_response["success"] = False
-        # Order doesn't always fill immediately, but one of these should work
-        if check_response["rejectionDetails"] is None:
-            check_response["success"] = True
-        if check_response["status"] == "FILLED":
-            check_response["success"] = True
-        return check_response
+        if not response.ok:
+            msg = f"Failed to retrieve option expirations for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return quote.GatewayOptionExpirationsResponse(**response.json())
+
+    @_refresh_check
+    def get_option_chain(self, account_id: str, instrument: order.GatewayOrderInstrument, expiration_date: datetime) -> quote.GatewayOptionChainResponse:
+        """Get option chain for a given instrument and expiration date. https://public.com/api/docs/resources/market-data/get-option-chain.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            instrument: The instrument to get the option chain for.
+            expiration_date: The expiration date of the option chain.
+
+        Returns:
+            A GatewayOptionChainResponse object containing the option chain for the specified instrument and expiration date.
+
+        Raises:
+            PublicAPIError: If the option chain request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.get_options_chain_url(account_id=account_id),
+            headers=self.session.headers,
+            json=quote.GatewayOptionChainRequest(instrument=instrument, expirationDate=expiration_date).model_dump(),
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to retrieve option chain for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return quote.GatewayOptionChainResponse(**response.json())
+
+    @_refresh_check
+    def preflight_single_leg(  # noqa: PLR0913, PLR0917
+        self,
+        account_id: str,
+        instrument: order.GatewayOrderInstrument,
+        order_side: preflight.OrderSide,
+        order_type: preflight.OrderType,
+        expiration: order.OrderExpiration,
+        quantity: str | None = None,
+        amount: str | None = None,
+        limit_price: str | None = None,
+        stop_price: str | None = None,
+        open_close_indicator: preflight.OpenCloseIndicator | None = None,
+    ) -> preflight.PreflightSingleLegResponse:
+        """Preflight a single leg order. https://public.com/api/docs/resources/order-placement/preflight-single-leg.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            instrument: The instrument to preflight the order for.
+            order_side: The side of the order (BUY/SELL).
+            order_type: The type of the order (MARKET/LIMIT/STOP/STOP_LIMIT).
+            expiration: The expiration of the order.
+            quantity: The quantity of the order. Mutually exclusive with `amount`.
+            amount: The amount of the order. Mutually exclusive with `quantity`.
+            limit_price: The limit price of the order. Used when order_type is LIMIT or STOP_LIMIT.
+            stop_price: The stop price of the order. Used when order_type is STOP or STOP_LIMIT.
+            open_close_indicator: The open/close indicator for options orders.
+
+        Returns:
+            A PreflightSingleLegResponse object containing the preflight information for the specified order.
+
+        Raises:
+            PublicAPIError: If the preflight request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.preflight_single_leg_url(account_id=account_id),
+            headers=self.session.headers,
+            json=preflight.PreflightSingleLegRequest(
+                instrument=instrument,
+                orderSide=order_side,
+                orderType=order_type,
+                expiration=expiration,
+                quantity=quantity,
+                amount=amount,
+                limitPrice=limit_price,
+                stopPrice=stop_price,
+                openCloseIndicator=open_close_indicator,
+            ).model_dump(),
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to preflight single leg for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return preflight.PreflightSingleLegResponse(**response.json())
+
+    @_refresh_check
+    def preflight_multi_leg(  # noqa: PLR0913, PLR0917
+        self,
+        account_id: str,
+        order_type: preflight.OrderType,
+        expiration: order.OrderExpiration,
+        legs: list[order.GatewayOrderLeg],
+        limit_price: str,
+        quantity: str | None = None,
+    ) -> preflight.PreflightMultiLegResponse:
+        """Preflight a multi leg order. https://public.com/api/docs/resources/order-placement/preflight-multi-leg.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            order_type: The type of the order (MARKET/LIMIT/STOP/STOP_LIMIT).
+            expiration: The expiration of the order.
+            quantity: The quantity of the order.
+            limit_price: The limit price of the order. Used when order_type is LIMIT or STOP_LIMIT.
+            legs: The legs of the multi leg order.
+
+        Returns:
+            A PreflightMultiLegResponse object containing the preflight information for the specified order.
+
+        Raises:
+            PublicAPIError: If the preflight request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.preflight_multi_leg_url(account_id=account_id),
+            headers=self.session.headers,
+            json=preflight.PreflightMultiLegRequest(
+                orderType=order_type,
+                expiration=expiration,
+                quantity=quantity,
+                limitPrice=limit_price,
+                legs=legs,
+            ).model_dump(),
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to preflight multi leg for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return preflight.PreflightMultiLegResponse(**response.json())
+
+    @_refresh_check
+    def place_order(  # noqa: PLR0913, PLR0917
+        self,
+        account_id: str,
+        instrument: order.GatewayOrderInstrument,
+        order_side: order.OrderSide,
+        order_type: order.OrderType,
+        expiration: order.OrderExpiration,
+        quantity: str | None = None,
+        amount: str | None = None,
+        limit_price: str | None = None,
+        stop_price: str | None = None,
+        open_close_indicator: order.OpenCloseIndicator | None = None,
+    ) -> order.ApiOrderResult:
+        """Place an order. https://public.com/api/docs/resources/order-placement/place-order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            instrument: The instrument to place the order for.
+            order_side: The side of the order (BUY/SELL).
+            order_type: The type of the order (MARKET/LIMIT/STOP/STOP_LIMIT).
+            expiration: The expiration of the order.
+            quantity: The quantity of the order. Mutually exclusive with `amount`.
+            amount: The amount of the order. Mutually exclusive with `quantity`.
+            limit_price: The limit price of the order. Used when order_type is LIMIT or STOP_LIMIT.
+            stop_price: The stop price of the order. Used when order_type is STOP or STOP_LIMIT.
+            open_close_indicator: The open/close indicator for options orders.
+
+        Returns:
+            An ApiOrderResult object containing the result of the placed order.
+
+        Raises:
+            PublicAPIError: If the place order request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.place_order_url(account_id=account_id),
+            headers=self.session.headers,
+            json=order.ApiOrderRequest(
+                orderId=uuid.uuid4(),
+                instrument=instrument,
+                orderSide=order_side,
+                orderType=order_type,
+                expiration=expiration,
+                quantity=quantity,
+                amount=amount,
+                limitPrice=limit_price,
+                stopPrice=stop_price,
+                openCloseIndicator=open_close_indicator,
+            ).model_dump(),
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to place order for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return order.ApiOrderResult(**response.json())
+
+    @_refresh_check
+    def place_multi_leg_order(
+        self,
+        account_id: str,
+        quantity: int,
+        limit_price: str,
+        expiration: order.OrderExpiration,
+        legs: list[order.GatewayOrderLeg],
+    ) -> order.ApiOrderResult:
+        """Place a multi leg order. https://public.com/api/docs/resources/order-placement/place-multileg-order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            expiration: The expiration of the order.
+            quantity: The quantity of the order.
+            limit_price: The limit price of the order. Used when order_type is LIMIT or STOP_LIMIT.
+            legs: The legs of the multi leg order.
+
+        Returns:
+            An ApiOrderResult object containing the result of the placed order.
+
+        Raises:
+            PublicAPIError: If the place multi leg order request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.post(
+            url=self.endpoints.place_multi_leg_order_url(account_id=account_id),
+            headers=self.session.headers,
+            json=order.ApiMultilegOrderRequest(
+                orderId=uuid.uuid4(),
+                type=order.TypeModel1.LIMIT,
+                expiration=expiration,
+                quantity=quantity,
+                limitPrice=limit_price,
+                legs=legs,
+            ).model_dump(),
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to place multi leg order for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return order.ApiOrderResult(**response.json())
+
+    @_refresh_check
+    def get_order(self, account_id: str, order_id: uuid.UUID) -> order.GatewayOrder:
+        """Retrieve the details of a specific order. https://public.com/api/docs/resources/order-placement/get-order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            order_id: The unique identifier for the order.
+
+        Returns:
+            A GatewayOrderDetails object containing the details of the specified order.
+
+        Raises:
+            PublicAPIError: If the get order request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.get(
+            url=self.endpoints.get_order_url(account_id=account_id, order_id=str(order_id)),
+            headers=self.session.headers,
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to retrieve order {order_id} for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
+        return order.GatewayOrder(**response.json())
+
+    @_refresh_check
+    def cancel_order(self, account_id: str, order_id: uuid.UUID) -> None:
+        """Cancel a specific order. https://public.com/api/docs/resources/order-placement/cancel-order.
+
+        Args:
+            account_id: The unique identifier for the user's account.
+            order_id: The unique identifier for the order.
+
+        Raises:
+            PublicAPIError: If the cancel order request fails (i.e., response status code is not 200).
+
+        """
+        response = self.session.delete(
+            url=self.endpoints.cancel_order_url(account_id=account_id, order_id=str(order_id)),
+            headers=self.session.headers,
+            timeout=self.timeout,
+        )
+        if not response.ok:
+            msg = f"Failed to cancel order {order_id} for account {account_id}: {response.status_code} {response.text}"
+            raise PublicAPIError(msg)
