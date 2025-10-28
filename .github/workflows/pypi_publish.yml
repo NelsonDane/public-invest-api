@@ -18,9 +18,9 @@ jobs:
       id-token: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4
       - name: Build and Publish
-        uses: lsst-sqre/build-and-publish-to-pypi@v3
+        uses: lsst-sqre/build-and-publish-to-pypi@7774a3c0d72614e0411b2ff327fba00ed711905d # v3
         with:
           upload: ${{ github.ref == 'refs/heads/main' }}
         
